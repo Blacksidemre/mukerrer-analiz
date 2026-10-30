@@ -1,0 +1,28 @@
+{
+  "Duplicate_Audit_Studio.xlsx": {
+    "zip_xml_kontrolu": "BAŞARILI",
+    "ayristirilan_formul_sayisi": 6300,
+    "onbellekteki_gostergeler": [
+      370,
+      180,
+      90,
+      100,
+      90
+    ],
+    "korunan_kaynak_kayit_sayisi": 370,
+    "sha256": "222dd6bb49eb11b73aac96894e3446b51cae0103bcb4a1bd868ee9626fea2629"
+  },
+  "Sentetik_Dosya_Analizi.xlsx": {
+    "zip_xml_kontrolu": "BAŞARILI",
+    "ayristirilan_formul_sayisi": 6300,
+    "onbellekteki_gostergeler": [
+      370,
+      180,
+      90,
+      100,
+      90
+    ],
+    "korunan_kaynak_kayit_sayisi": 370,
+    "sha256": "042ed50a49b7d3f10ccd7d5709a8f9b55a3c7920f1d7c9f1eefb80caf8b93f2e"
+  }
+}

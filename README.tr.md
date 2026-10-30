@@ -49,4 +49,4 @@ Formüllü kaynakları yüklemeden önce Excel'de hesaplayıp kaydedin. İçe ak
 
 Dosyalar bir analiz sunucusuna gönderilmez. VBA ağ çağrısı yapmaz. OneDrive eşitlemesi açıksa Excel dosyayı eşitleyebilir; yerel klasör tercih edebilirsiniz. Bu mimari otomatik mevzuat uyumluluğu sağlamaz.
 
-[Doğrulama raporu](docs/VALIDATION.md) ve [Excel kabul kontrolü](tests/ACCEPTANCE.md) henüz çalıştırılmamış masaüstü kontrollerini belirtir. Test edilmemiş bir XLSM veya canlı demo teslim edilmiş gibi sunulmaz.
+[Doğrulama raporu](docs/DOGRULAMA.md) ve [Excel kabul kontrolü](tests/KABUL_KONTROLLERI.md) henüz çalıştırılmamış masaüstü kontrollerini belirtir. Test edilmemiş bir XLSM veya canlı demo teslim edilmiş gibi sunulmaz.

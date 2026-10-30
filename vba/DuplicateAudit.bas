@@ -1,6 +1,6 @@
 Attribute VB_Name = "DuplicateAudit"
 Option Explicit
-' Excel LTSC 2024 / Windows. No external libraries or network operations.
+' Excel LTSC 2024 / Windows. Harici kitaplik veya ag islemi kullanilmaz.
 Private Const RAW As String = "01_Ham_Veri"
 Private Const CRIT As String = "02_Kriterler"
 Private Const OUT As String = "03_Kontrol"
@@ -34,7 +34,7 @@ Private Function TurkishLower(ByVal s As String) As String
 End Function
 Private Function Token(ByVal v As Variant, ByVal clean As Boolean, ByVal fold As Boolean) As String
     Dim s As String, typ As String
-    If IsError(v) Then Err.Raise vbObjectError + 1, , "Hucre hatasi var. Kaynak veriyi duzeltin."
+    If IsError(v) Then Err.Raise vbObjectError + 1, , ("H" & ChrW(252) & "cre hatas" & ChrW(305) & " var. Kaynak veriyi d" & ChrW(252) & "zeltin.")
     Select Case VarType(v)
     Case vbEmpty, vbNull: typ = "E": s = ""
     Case vbString
@@ -54,15 +54,15 @@ Private Function KeyFor(ByRef data As Variant, ByVal r As Long, ByRef flags As V
     Next c
     KeyFor = k
 End Function
-' Pure array engine: output columns = status, group, count, original source row, source row.
+' Dizi motoru: cikti sutunlari = durum, grup, adet, orijinal kaynak satiri, kaynak satiri.
 Public Function AuditArray(ByRef data As Variant, ByRef flags As Variant, Optional ByVal clean As Boolean = False, Optional ByVal fold As Boolean = False) As Variant
     Dim counts As Object, firsts As Object, keys() As String, result() As Variant
     Dim r As Long, c As Long, n As Long, selected As Long, k As String, first As Long
     For c = 1 To UBound(data, 2)
-        If flags(c, 1) <> 0 And flags(c, 1) <> 1 Then Err.Raise vbObjectError + 2, , "Kriterler yalnizca 0 veya 1 olmali."
+        If flags(c, 1) <> 0 And flags(c, 1) <> 1 Then Err.Raise vbObjectError + 2, , ("Kriterler yaln" & ChrW(305) & "zca 0 veya 1 olmal" & ChrW(305) & ".")
         selected = selected + flags(c, 1)
     Next c
-    If selected = 0 Then Err.Raise vbObjectError + 3, , "En az bir kriter secin."
+    If selected = 0 Then Err.Raise vbObjectError + 3, , ("En az bir kriter se" & ChrW(231) & "in.")
     n = UBound(data, 1)
     ReDim keys(1 To n): ReDim result(1 To n, 1 To 5)
     Set counts = CreateObject("Scripting.Dictionary"): counts.CompareMode = vbBinaryCompare
@@ -90,7 +90,7 @@ Public Function AuditArray(ByRef data As Variant, ByRef flags As Variant, Option
     AuditArray = result
 End Function
 Private Sub WriteLiteral(ByVal target As Range, ByRef values As Variant)
-    ' Prevent strings beginning =, +, -, @ from becoming formulas. Preserve numeric types.
+    ' =, +, -, @ ile baslayan metinlerin formule donusmesini engelle. Sayisal turleri koru.
     Dim safe As Variant, r As Long, c As Long
     safe = values
     For r = 1 To UBound(safe, 1)
@@ -107,7 +107,7 @@ Public Sub AnalizEt()
     calc = Application.Calculation
     Set s = ThisWorkbook.Worksheets(RAW): Set cfg = ThisWorkbook.Worksheets(CRIT): Set dst = ThisWorkbook.Worksheets(OUT)
     nr = LastRow(s) - 1: nc = LastCol(s)
-    If nr < 1 Or nr > MAX_ROWS Or nc < 1 Or nc > MAX_COLS Then Err.Raise vbObjectError + 4, , "Sinir: 1-50.000 kayit, 1-100 sutun."
+    If nr < 1 Or nr > MAX_ROWS Or nc < 1 Or nc > MAX_COLS Then Err.Raise vbObjectError + 4, , ("S" & ChrW(305) & "n" & ChrW(305) & "r: 1-50.000 kay" & ChrW(305) & "t, 1-100 s" & ChrW(252) & "tun.")
     data = s.Range(s.Cells(2, 1), s.Cells(nr + 1, nc)).Value2
     If nr = 1 And nc = 1 Then
         ReDim data(1 To 1, 1 To 1): data(1, 1) = s.Cells(2, 1).Value2
@@ -124,19 +124,19 @@ Public Sub AnalizEt()
     dst.Columns.Hidden = False
     s.Range(s.Cells(1, 1), s.Cells(1, nc)).Copy dst.Cells(1, 1)
     WriteLiteral dst.Cells(2, 1).Resize(nr, nc), data
-    ' Retain date/code display formats from the source without turning text codes into numbers.
+    ' Metin kodlarini sayiya cevirmeden kaynak tarih ve kod gorunum bicimlerini koru.
     For c = 1 To nc
         s.Range(s.Cells(2, c), s.Cells(nr + 1, c)).Copy
         dst.Cells(2, c).PasteSpecial xlPasteFormats
     Next c
     Application.CutCopyMode = False
-    dst.Cells(1, nc + 1).Resize(1, 5).Value = Array("Kayit Durumu", "Eslesme Grubu ID", "Eslesme Adedi", "Orijinal Kayit Referansi", "Kaynak Satir Numarasi")
+    dst.Cells(1, nc + 1).Resize(1, 5).Value = Array(("Kay" & ChrW(305) & "t Durumu"), ("E" & ChrW(351) & "le" & ChrW(351) & "me Grubu Kimli" & ChrW(287) & "i"), ("E" & ChrW(351) & "le" & ChrW(351) & "me Adedi"), ("Orijinal Kay" & ChrW(305) & "t Referans" & ChrW(305)), ("Kaynak Sat" & ChrW(305) & "r Numaras" & ChrW(305)))
     dst.Cells(2, nc + 1).Resize(nr, 5).Value2 = result
     StyleResult dst, nr, nc
     UpdateSummary result, flags, Timer - started
-    cfg.Range("E10").Value = "VBA anlik sonuc: veri/kriter degisince AnalizEt calistirin."
-    ThisWorkbook.Worksheets("00_Baslangic").Range("B15").Value = "VBA analizi tamamlandi: " & Format$(Now, "yyyy-mm-dd hh:nn:ss")
-    MsgBox nr & " kayit analiz edildi. Hicbir kayit silinmedi.", vbInformation
+    cfg.Range("E10").Value = ("VBA anl" & ChrW(305) & "k sonu" & ChrW(231) & ": veri/kriter de" & ChrW(287) & "i" & ChrW(351) & "ince AnalizEt " & ChrW(231) & "al" & ChrW(305) & ChrW(351) & "t" & ChrW(305) & "r" & ChrW(305) & "n.")
+    ThisWorkbook.Worksheets("00_Baslangic").Range("B15").Value = ("VBA analizi tamamland" & ChrW(305) & ": ") & Format$(Now, "yyyy-mm-dd hh:nn:ss")
+    MsgBox nr & (" kay" & ChrW(305) & "t analiz edildi. Hi" & ChrW(231) & "bir kay" & ChrW(305) & "t silinmedi."), vbInformation
 Done:
     Application.Calculation = calc: Application.EnableEvents = True: Application.ScreenUpdating = True
     Exit Sub
@@ -182,26 +182,26 @@ Public Sub DosyaYukle()
     On Error GoTo Failed
     path = Application.GetOpenFilename("Excel veya CSV (*.xlsx;*.csv),*.xlsx;*.csv")
     If VarType(path) = vbBoolean Then Exit Sub
-    If CStr(path) = ThisWorkbook.FullName Then Err.Raise vbObjectError + 8, , "Analiz kitabinin kendisini yuklemeyin."
-    If LCase$(Right$(CStr(path), 5)) <> ".xlsx" And LCase$(Right$(CStr(path), 4)) <> ".csv" Then Err.Raise vbObjectError + 5, , "Yalnizca XLSX veya CSV secin."
+    If CStr(path) = ThisWorkbook.FullName Then Err.Raise vbObjectError + 8, , ("Analiz kitab" & ChrW(305) & "n" & ChrW(305) & "n kendisini y" & ChrW(252) & "klemeyin.")
+    If LCase$(Right$(CStr(path), 5)) <> ".xlsx" And LCase$(Right$(CStr(path), 4)) <> ".csv" Then Err.Raise vbObjectError + 5, , ("Yaln" & ChrW(305) & "zca XLSX veya CSV se" & ChrW(231) & "in.")
     If LCase$(Right$(CStr(path), 4)) = ".csv" Then
-        MsgBox "CSV icin Excel Veri > Metin/CSV'den yolunu kullanin. Kodlamayi UTF-8 veya Windows-1254, ayraci uygun secin. Kod sutunlarini METIN yapin. Sonucu XLSX kaydedip yukleyin.", vbInformation
+        MsgBox ("CSV i" & ChrW(231) & "in Excel Veri > Metin/CSV'den yolunu kullan" & ChrW(305) & "n. Kodlamay" & ChrW(305) & " UTF-8 veya Windows-1254, ayrac" & ChrW(305) & " uygun se" & ChrW(231) & "in. Kod s" & ChrW(252) & "tunlar" & ChrW(305) & "n" & ChrW(305) & " MET" & ChrW(304) & "N yap" & ChrW(305) & "n. Sonucu XLSX kaydedip y" & ChrW(252) & "kleyin."), vbInformation
         Exit Sub
     End If
     Application.AutomationSecurity = 3: Application.EnableEvents = False: Application.Calculation = xlCalculationManual
     Set wb = Workbooks.Open(CStr(path), UpdateLinks:=0, ReadOnly:=True, AddToMru:=False)
     For i = 1 To wb.Worksheets.Count: names = names & i & " - " & wb.Worksheets(i).Name & vbCrLf: Next i
-    answer = Application.InputBox("Sayfa numarasi:" & vbCrLf & Left$(names, 180), "Veri sayfasi", 1, Type:=1)
+    answer = Application.InputBox(("Sayfa numaras" & ChrW(305) & ":") & vbCrLf & Left$(names, 180), ("Veri sayfas" & ChrW(305)), 1, Type:=1)
     If VarType(answer) = vbBoolean Then GoTo Done
-    If answer <> Fix(answer) Or answer < 1 Or answer > wb.Worksheets.Count Then Err.Raise vbObjectError + 6, , "Gecersiz sayfa."
+    If answer <> Fix(answer) Or answer < 1 Or answer > wb.Worksheets.Count Then Err.Raise vbObjectError + 6, , ("Ge" & ChrW(231) & "ersiz sayfa.")
     chosen = CLng(answer): Set s = wb.Worksheets(chosen)
     nr = LastRow(s): nc = LastCol(s)
-    If nr < 2 Or nr > MAX_ROWS + 1 Or nc > MAX_COLS Then Err.Raise vbObjectError + 7, , "Sinir: 50.000 kayit / 100 sutun. Ilk satir baslik olmali."
-    If MsgBox("Mevcut ham veri ve analiz degisecek. Devam?", vbYesNo + vbQuestion) <> vbYes Then GoTo Done
+    If nr < 2 Or nr > MAX_ROWS + 1 Or nc > MAX_COLS Then Err.Raise vbObjectError + 7, , ("S" & ChrW(305) & "n" & ChrW(305) & "r: 50.000 kay" & ChrW(305) & "t / 100 s" & ChrW(252) & "tun. " & ChrW(304) & "lk sat" & ChrW(305) & "r ba" & ChrW(351) & "l" & ChrW(305) & "k olmal" & ChrW(305) & ".")
+    If MsgBox(("Mevcut ham veri ve analiz de" & ChrW(287) & "i" & ChrW(351) & "ecek. Devam edilsin mi?"), vbYesNo + vbQuestion) <> vbYes Then GoTo Done
     values = s.Range(s.Cells(1, 1), s.Cells(nr, nc)).Value2
     Set headers = CreateObject("Scripting.Dictionary"): headers.CompareMode = vbBinaryCompare
     For c = 1 To nc
-        base = Trim$(CStr(values(1, c))): If base = "" Then base = "Sutun " & c
+        base = Trim$(CStr(values(1, c))): If base = "" Then base = ("S" & ChrW(252) & "tun ") & c
         h = base: suffix = 2
         Do While headers.Exists(h): h = base & " (" & suffix & ")": suffix = suffix + 1: Loop
         headers.Add h, True: values(1, c) = h
@@ -217,12 +217,12 @@ Public Sub DosyaYukle()
     With ThisWorkbook.Worksheets(CRIT)
         .Range("A7:B106").ClearContents
         For c = 1 To nc: .Cells(c + 6, 1).Value = values(1, c): .Cells(c + 6, 2).Value = 1: Next c
-        .Range("E10").Value = "Yeni veri. AnalizEt calistirin."
+        .Range("E10").Value = ("Yeni veri. AnalizEt " & ChrW(231) & "al" & ChrW(305) & ChrW(351) & "t" & ChrW(305) & "r" & ChrW(305) & "n.")
     End With
     ThisWorkbook.Worksheets(OUT).Cells.Clear
     ThisWorkbook.Worksheets(SUMMARY).Range("B4:B12").ClearContents
-    ThisWorkbook.Worksheets("00_Baslangic").Range("B15").Value = "Yeni dosya yuklendi; onceki analiz gecersiz."
-    MsgBox nr - 1 & " kayit / " & nc & " sutun yuklendi. Kriterleri secip AnalizEt calistirin.", vbInformation
+    ThisWorkbook.Worksheets("00_Baslangic").Range("B15").Value = ("Yeni dosya y" & ChrW(252) & "klendi; " & ChrW(246) & "nceki analiz ge" & ChrW(231) & "ersiz.")
+    MsgBox nr - 1 & (" kay" & ChrW(305) & "t / ") & nc & (" s" & ChrW(252) & "tun y" & ChrW(252) & "klendi. Kriterleri se" & ChrW(231) & "ip AnalizEt " & ChrW(231) & "al" & ChrW(305) & ChrW(351) & "t" & ChrW(305) & "r" & ChrW(305) & "n."), vbInformation
 Done:
     If Not wb Is Nothing Then wb.Close SaveChanges:=False
     Application.AutomationSecurity = oldSecurity: Application.EnableEvents = oldEvents: Application.Calculation = oldCalc
@@ -233,8 +233,8 @@ Failed:
 End Sub
 Public Sub ExcelAktar()
     Dim path As Variant, wb As Workbook, s As Worksheet
-    If LastRow(ThisWorkbook.Worksheets(OUT)) < 2 Then MsgBox "Once analiz yapin.", vbExclamation: Exit Sub
-    If MsgBox("VBA modunda son veri/kriter degisikliginden sonra AnalizEt calistirdiniz mi?", vbYesNo + vbQuestion) <> vbYes Then Exit Sub
+    If LastRow(ThisWorkbook.Worksheets(OUT)) < 2 Then MsgBox (ChrW(214) & "nce analiz yap" & ChrW(305) & "n."), vbExclamation: Exit Sub
+    If MsgBox(("VBA modunda son veri/kriter de" & ChrW(287) & "i" & ChrW(351) & "ikli" & ChrW(287) & "inden sonra AnalizEt " & ChrW(231) & "al" & ChrW(305) & ChrW(351) & "t" & ChrW(305) & "rd" & ChrW(305) & "n" & ChrW(305) & "z m" & ChrW(305) & "?"), vbYesNo + vbQuestion) <> vbYes Then Exit Sub
     path = Application.GetSaveAsFilename("Duplicate_Audit_Sonuc.xlsx", "Excel (*.xlsx),*.xlsx")
     If VarType(path) = vbBoolean Then Exit Sub
     On Error GoTo Failed
@@ -246,7 +246,7 @@ Public Sub ExcelAktar()
     Application.CutCopyMode = False
     wb.SaveAs Filename:=CStr(path), FileFormat:=xlOpenXMLWorkbook
     wb.Close False
-    MsgBox "Statik anlik sonuc kaydedildi. Kaynak veri silinmedi.", vbInformation
+    MsgBox ("Statik anl" & ChrW(305) & "k sonu" & ChrW(231) & " kaydedildi. Kaynak veri silinmedi."), vbInformation
     Exit Sub
 Failed:
     MsgBox Err.Description, vbExclamation
@@ -255,7 +255,7 @@ End Sub
 Public Sub GrubuIncele()
     Dim s As Worksheet, nc As Long, group As String
     Set s = ThisWorkbook.Worksheets(OUT): nc = LastCol(ThisWorkbook.Worksheets(RAW))
-    group = InputBox("Grup ID (ornek GRP-000002). Bos birakmak filtreyi kaldirir.")
+    group = InputBox(("Grup kimli" & ChrW(287) & "i (" & ChrW(246) & "rnek GRP-000002). Bo" & ChrW(351) & " b" & ChrW(305) & "rakmak filtreyi kald" & ChrW(305) & "r" & ChrW(305) & "r."))
     If LastRow(s) < 2 Then Exit Sub
     s.Activate
     If s.FilterMode Then s.ShowAllData
@@ -264,7 +264,7 @@ End Sub
 Public Sub Kurulum()
     Dim s As Worksheet, button As Shape, names As Variant, actions As Variant, i As Long
     Set s = ThisWorkbook.Worksheets("00_Baslangic")
-    names = Array("Dosya yukle", "Analiz et", "Grubu incele", "Excel aktar", "Testleri calistir", "Performans olc")
+    names = Array(("Dosya y" & ChrW(252) & "kle"), "Analiz et", "Grubu incele", "Excel aktar", ("Testleri " & ChrW(231) & "al" & ChrW(305) & ChrW(351) & "t" & ChrW(305) & "r"), ("Performans " & ChrW(246) & "l" & ChrW(231)))
     actions = Array("DosyaYukle", "AnalizEt", "GrubuIncele", "ExcelAktar", "TestleriCalistir", "PerformansOlc")
     For i = s.Shapes.Count To 1 Step -1
         If Left$(s.Shapes(i).Name, 9) = "DA_Button" Then s.Shapes(i).Delete
@@ -276,13 +276,13 @@ Public Sub Kurulum()
         button.Fill.ForeColor.RGB = RGB(20, 63, 54): button.TextFrame2.TextRange.Font.Fill.ForeColor.RGB = vbWhite
         button.OnAction = "'" & Replace(ThisWorkbook.Name, "'", "''") & "'!" & actions(i)
     Next i
-    MsgBox "Dugmeler hazir. Dosyayi XLSM olarak kaydedin.", vbInformation
+    MsgBox ("D" & ChrW(252) & ChrW(287) & "meler haz" & ChrW(305) & "r. Dosyay" & ChrW(305) & " XLSM olarak kaydedin."), vbInformation
 End Sub
 Public Sub YanYanaKarsilastir()
     Dim s As Worksheet, view As Worksheet, nc As Long, r As Long, c As Long, col As Long, group As String, v As Variant
     Set s = ThisWorkbook.Worksheets(OUT): nc = LastCol(ThisWorkbook.Worksheets(RAW))
-    If LastRow(s) < 2 Then MsgBox "Once analiz yapin.", vbExclamation: Exit Sub
-    group = InputBox("Yan yana karsilastirilacak grup ID (ornegin GRP-000002):")
+    If LastRow(s) < 2 Then MsgBox (ChrW(214) & "nce analiz yap" & ChrW(305) & "n."), vbExclamation: Exit Sub
+    group = InputBox(("Yan yana kar" & ChrW(351) & ChrW(305) & "la" & ChrW(351) & "t" & ChrW(305) & "r" & ChrW(305) & "lacak grup kimli" & ChrW(287) & "i (" & ChrW(246) & "rne" & ChrW(287) & "in GRP-000002):"))
     If Len(group) = 0 Then Exit Sub
     On Error Resume Next
     Set view = ThisWorkbook.Worksheets("06_Karsilastirma")
@@ -291,7 +291,7 @@ Public Sub YanYanaKarsilastir()
         Set view = ThisWorkbook.Worksheets.Add(After:=ThisWorkbook.Worksheets(ThisWorkbook.Worksheets.Count))
         view.Name = "06_Karsilastirma"
     End If
-    view.Cells.Clear: view.Cells(1, 1).Value = "Alan / Kaynak satir": col = 2
+    view.Cells.Clear: view.Cells(1, 1).Value = ("Alan / Kaynak sat" & ChrW(305) & "r"): col = 2
     For c = 1 To nc + 5: view.Cells(c + 1, 1).Value = "'" & CStr(s.Cells(1, c).Value): Next c
     For r = 2 To LastRow(s)
         If s.Cells(r, nc + 2).Value = group Then
@@ -307,5 +307,5 @@ Public Sub YanYanaKarsilastir()
         End If
     Next r
     view.Columns.ColumnWidth = 24: view.Rows(1).Font.Bold = True: view.Activate
-    MsgBox "En fazla ilk 20 kayit yan yana gosterilir. Tum grup icin GrubuIncele kullanin.", vbInformation
+    MsgBox ("En fazla ilk 20 kay" & ChrW(305) & "t yan yana g" & ChrW(246) & "sterilir. T" & ChrW(252) & "m grup i" & ChrW(231) & "in GrubuIncele kullan" & ChrW(305) & "n."), vbInformation
 End Sub

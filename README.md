@@ -1,111 +1,115 @@
-# Duplicate Audit Studio · Excel Edition
+# Duplicate Audit Studio · Excel Sürümü
 
-**Deterministic, multi-column duplicate auditing inside Microsoft Excel LTSC 2024.**
+**Microsoft Excel LTSC 2024 içinde çok kriterli, kesin ve izlenebilir mükerrer kayıt analizi.**
 
-[![Workbook integrity](https://github.com/Blacksidemre/m-kerrer-analiz/actions/workflows/integrity.yml/badge.svg)](https://github.com/Blacksidemre/m-kerrer-analiz/actions/workflows/integrity.yml)
+[![Çalışma kitabı bütünlüğü](https://github.com/Blacksidemre/m-kerrer-analiz/actions/workflows/integrity.yml/badge.svg)](https://github.com/Blacksidemre/m-kerrer-analiz/actions/workflows/integrity.yml)
 
-[Turkish guide](README.tr.md) · [Download workbook](deliverables/Duplicate_Audit_Studio.xlsx) · [Validation report](docs/VALIDATION.md)
+[Kullanım rehberi](README.tr.md) · [Excel kitabını indir](deliverables/Duplicate_Audit_Studio.xlsx) · [Doğrulama raporu](docs/DOGRULAMA.md)
 
-Designed for analysts who need to identify duplicate records without deleting data. Select columns with 1/0 switches, inspect full-row status colors, trace every group to its first source row, and export an auditable snapshot. There is no web application, backend, database, AI API, or JavaScript dependency.
+Veri analistleri için hazırlanan bu çözüm, hiçbir kaydı silmeden mükerrerleri belirler. Sütunları 1/0 değerleriyle seçin, satır renklerinden kayıt durumlarını inceleyin, her grubun ilk kaynak kaydına ulaşın ve denetlenebilir bir Excel raporu oluşturun. Uygulama yalnızca Excel formülleri ve VBA ile çalışır.
 
-> **Release status:** formula workbook and VBA source delivered. Desktop Excel is unavailable in the build environment. VBA execution, Excel formula recalculation, end-to-end behavior, and 50,000-row timings require validation in Excel LTSC 2024. This is a review release, not a certified production release. The XLSX contains no embedded VBA; import the two modules to create your XLSM.
+> **Sürüm durumu:** Formüllü çalışma kitabı ve VBA kaynakları teslim edilmiştir. Geliştirme ortamında masaüstü Excel bulunmadığı için VBA çalıştırma, Excel formüllerinin yeniden hesaplanması, uçtan uca kullanım ve 50.000 satır performansı Excel LTSC 2024 üzerinde doğrulanmayı beklemektedir. Bu bir **inceleme sürümüdür**. XLSX dosyası gömülü makro içermez; XLSM oluşturmak için iki VBA modülünü içe aktarın.
 
-## Choose a workflow
+## Çalışma biçimleri
 
-| Workflow | Delivered | Recalculation | Intended scale |
+| Çalışma biçimi | Dosya veya işlem | Yeniden hesaplama | Kapsam |
 |---|---|---|---|
-| Formula sample | `deliverables/Duplicate_Audit_Studio.xlsx` | Criteria changes recalculate formulas in Excel | Fixed 370-row, 12-column demonstration |
-| VBA analysis | `vba/DuplicateAudit.bas` | Run `AnalizEt` after changing data/criteria | Up to 50,000 rows / 100 columns; unbenchmarked |
-| VBA tests | `vba/AuditTests.bas` | Run explicitly in Excel | Assertions and 4 benchmark sizes |
-| Export | `ExcelAktar` creates XLSX | Static values, not a dynamic analysis engine | All analyzed rows |
+| Formüllü örnek | `deliverables/Duplicate_Audit_Studio.xlsx` | Kriter değişince Excel formülleri yeniden hesaplanır | Sabit 370 satır ve 12 sütun |
+| VBA analizi | `vba/DuplicateAudit.bas` | Veri/kriter değişince `AnalizEt` çalıştırılır | En fazla 50.000 satır / 100 sütun; performans ölçülmedi |
+| VBA testleri | `vba/AuditTests.bas` | Excel içinde ayrıca çalıştırılır | Doğrulama kontrolleri ve dört veri büyüklüğünde ölçüm |
+| Dışa aktarma | `ExcelAktar` | Statik değerler; yeniden analiz yapılmaz | Analiz edilen bütün kayıtlar |
 
-Formula mode uses quadratic exact comparisons. Do not extend it to 50,000 rows. VBA uses dictionaries with expected linear processing in rows × selected columns; this is an algorithmic property, not a measured performance claim.
+Formül modunda kesin karşılaştırma sayısı satır sayısının karesiyle artar. Bu örneği 50.000 satıra genişletmeyin. VBA motoru sözlük yapısıyla çalışır; beklenen işlem miktarı satır sayısı × seçili sütun sayısıyla orantılıdır. Bu algoritmanın özelliğidir; ölçülmüş hız iddiası değildir.
 
-## Quick start
+## Hızlı başlangıç
 
-1. Open the XLSX in Excel LTSC 2024. Set calculation to **Automatic**. Use **Ctrl+Alt+F9** to recalculate fully.
-2. Open `02_Kriterler`. Set `B7:B18` to 1 or 0. Initial selection: file code, debtor code, product, principal.
-3. Inspect `03_Kontrol`. Use header filters for status or group. Sort the **whole table**, never one column alone.
-4. Check `04_Ozet`: 370 = 180 unique + 90 originals + 100 surplus duplicates. There are 90 duplicate groups.
+1. XLSX dosyasını Excel LTSC 2024 ile açın. **Formüller → Hesaplama Seçenekleri → Otomatik** seçin. **Ctrl+Alt+F9** ile tam hesaplatın.
+2. `02_Kriterler` sayfasında `B7:B18` hücrelerini 1 veya 0 yapın. Başlangıç seçimi: dosya kodu, borçlu kodu, ürün türü ve anapara.
+3. `03_Kontrol` sayfasında başlık filtreleriyle durum veya grup seçin. Sıralarken **bütün tabloyu** sıralayın; tek sütunu bağımsız sıralamayın.
+4. `04_Ozet` sonucunu kontrol edin: **370 = 180 tekil + 90 orijinal + 100 fazladan mükerrer**. Mükerrer grup sayısı **90**.
 
-For arbitrary file imports, exports, options and large datasets, install VBA:
+## VBA kurulumu
 
-1. Save the workbook as **Excel Macro-Enabled Workbook (.xlsm)** in a local folder.
-2. Press **Alt+F11 → File → Import File** and import both `.bas` files from `vba/`.
-3. Choose **Debug → Compile VBAProject**. Return to Excel, **Alt+F8 → Kurulum**.
-4. Enable only reviewed macros according to your organization's policies. No access to the VBA project object model is required by the application.
-5. Run **TestleriCalistir**, then **PerformansOlc**. Results appear in `05_Testler`.
+Yeni dosyaları yüklemek, seçenekleri uygulamak, büyük veri kümelerini analiz etmek ve rapor almak için:
 
-The setup macro creates six functional buttons. Other macros are available through Alt+F8. If the file is renamed after setup, rerun `Kurulum` to bind buttons to the new filename.
+1. Çalışma kitabını yerel bir klasöre **Excel Makro Etkin Çalışma Kitabı (.xlsm)** olarak kaydedin.
+2. **Alt+F11 → Dosya → Dosya Al** yoluyla `vba/` klasöründeki iki `.bas` dosyasını içe aktarın. VBA düzenleyicisi İngilizceyse menü adları **File → Import File** şeklindedir.
+3. VBA düzenleyicisinde **Hata Ayıkla → VBAProject'i Derle** komutunu çalıştırın; İngilizce menü karşılığı **Debug → Compile VBAProject**. Excel'e dönüp **Alt+F8 → Kurulum** çalıştırın.
+4. Yalnızca incelediğiniz makroları kurumunuzun politikalarına göre etkinleştirin. Uygulama, VBA proje nesne modeline güven erişimi gerektirmez.
+5. Önce **TestleriCalistir**, ardından **PerformansOlc** çalıştırın. Sonuçlar `05_Testler` sayfasına yazılır.
 
-## Import → select → analyze → inspect → export
+Kurulum makrosu altı işlevsel düğme oluşturur. Diğer makrolara Alt+F8 ile ulaşılır. Kurulumdan sonra dosyanın adını değiştirirseniz düğme bağlantılarını güncellemek için `Kurulum` işlemini yeniden çalıştırın.
 
-- **DosyaYukle**: select an XLSX and a sheet number. First row is the header. The previous dataset is replaced only after a confirmation; old results are cleared. No records within the new dataset are removed, including interior blank rows. Duplicate/empty headers get unique names.
-- **CSV**: use Excel's **Data → From Text/CSV**. Choose UTF-8 or Windows-1254 and comma/semicolon/tab explicitly. Set code columns to **Text**, load into a sheet, save as XLSX, then import. The macro deliberately does not guess CSV encodings or convert code columns automatically.
-- **02_Kriterler**: every imported column appears with a 1/0 flag. `F7` trims edge ASCII spaces and `F8` enables Turkish case folding for VBA only. Defaults are exact.
-- **AnalizEt**: analyzes all records using active criteria. No criteria is an error. Results include status, group, group size, original reference and source row. Source row numbering starts at 2, after the header.
-- **GrubuIncele**: filters by exact group ID. Empty input clears the filter. Header dropdowns also support status filtering and text search.
-- **YanYanaKarsilastir**: puts up to 20 members of a selected group side by side in `06_Karsilastirma`. The complete group remains available in the results table.
-- **ExcelAktar**: exports the four analysis sheets as a values-only snapshot. Confirm that you have rerun analysis after edits. Output retains filters and conditional colors. It does not recalculate when exported criteria change.
+## Dosya yükle → kriter seç → analiz et → incele → dışa aktar
 
-## Matching contract
+- **DosyaYukle:** Bir XLSX dosyası ve sayfa numarası seçin. İlk satır başlık olmalıdır. Mevcut veri onayınızdan sonra değiştirilir; eski sonuçlar temizlenir. Yeni veri içindeki boş ara satırlar dahil hiçbir kayıt silinmez. Boş veya tekrarlı başlıklara benzersiz adlar verilir.
+- **CSV:** Excel'in **Veri → Metin/CSV'den** komutunu kullanın. UTF-8 veya Windows-1254 kodlamasını ve virgül/noktalı virgül/sekme ayracını seçin. Kod sütunlarını **Metin** olarak yükleyin, XLSX olarak kaydedip içe aktarın. Makro kodlamayı tahmin etmez ve kod sütunlarını kendiliğinden sayıya dönüştürmez.
+- **02_Kriterler:** Yüklenen her sütunun yanında 1/0 seçimi bulunur. Yalnızca VBA için `F7`, metnin kenarlarındaki ASCII boşluklarını temizler; `F8`, Türkçe büyük/küçük harf farkını kaldırır. Varsayılan kesin eşleşmedir.
+- **AnalizEt:** Bütün kayıtları etkin kriterlerle analiz eder. Hiç kriter seçilmemesi hatadır. Her kayıtta durum, grup, eşleşme adedi, orijinal referansı ve kaynak satır numarası yer alır. Kaynak satırları başlıktan sonra, 2'den başlar.
+- **GrubuIncele:** Tam grup kimliğiyle filtreler. Boş giriş filtreyi kaldırır. Başlık menüleri durum filtrelemeyi ve metin aramasını da destekler.
+- **YanYanaKarsilastir:** Seçilen grubun en fazla 20 kaydını `06_Karsilastirma` sayfasında yan yana gösterir. Grubun tamamı sonuç tablosunda bulunur.
+- **ExcelAktar:** Dört analiz sayfasını yalnızca değerlerden oluşan anlık rapor olarak kaydeder. Veri/kriter değişikliğinden sonra analizi yeniden çalıştırdığınızı doğrulayın. Filtreler ve koşullu renkler korunur. Dışa aktarılan kriterlerin değiştirilmesi raporu yeniden hesaplamaz.
 
-`TEKİL` = group of one. `ORİJİNAL` = first source record in a repeated group. `MÜKERRER` = every later record. The source sheet order, not display order, determines the original.
+## Eşleştirme kuralları
 
-Keys are typed, length-prefixed tuples. `AB + C` differs from `A + BC`. Strings and numbers differ; text `001` remains different from text `1`. Empty strings and blank cells match. Wildcards are literal. Defaults preserve case and whitespace. No fuzzy matching, rounding of amounts, or Unicode canonical normalization is performed.
+**TEKİL**, grubunda tek olan kayıttır. **ORİJİNAL**, tekrarlı grubun kaynak dosyadaki ilk kaydıdır. **MÜKERRER**, aynı grubun sonraki kayıtlarıdır. Orijinal belirlenirken kaynak sırası kullanılır.
 
-Excel dates are serial numbers; date formatting does not create a separate value type. Numeric `1` displayed with `0000` is still numeric `1`. Store identifiers as text before import. Excel's 15-significant-digit numeric precision cannot recover digits already lost in a source workbook. Formula cells are imported as their current values; calculate and save source workbooks before import. Source formulas, comments, charts, merged layouts and links are not archived as executable objects.
+Anahtarlar veri türünü ve her değerin uzunluğunu içerir. `AB + C` ile `A + BC` farklıdır. Metin ve sayı ayrıdır; metin `001`, metin `1` ile eşleşmez. Boş hücre ile boş metin eşleşir. Joker karakterler normal karakter olarak değerlendirilir. Varsayılan karşılaştırma harf ve boşluk farklarını korur. Yaklaşık eşleştirme, tutar yuvarlama veya Unicode bileşim normalizasyonu yapılmaz.
 
-VBA uses binary dictionary comparison. Optional Turkish folding explicitly maps `I → ı` and `İ → i`. The formula demonstration always uses case-sensitive `EXACT`, independent of VBA options. Group IDs use the first source row (`GRP-000002`), unique within one analysis, not globally across files.
+Excel tarihleri seri sayılardır; tarih biçimi ayrı bir veri türü oluşturmaz. `0000` biçimiyle gösterilen sayı `1`, yine sayı `1` değeridir. Kimlik alanlarını içe aktarmadan önce metin olarak tutun. Excel'in 15 anlamlı basamak sınırı nedeniyle kaynakta kaybolmuş sayısal basamaklar geri getirilemez. Formüllü hücreler mevcut değerleriyle alınır; kaynak kitabı önceden hesaplatıp kaydedin. Kaynak formülleri, açıklamalar, grafikler, birleştirilmiş düzenler ve bağlantılar çalıştırılabilir nesneler olarak arşivlenmez.
 
-Sorting cannot change stored VBA original references. Formula mode uses immutable source-row cells and indexed source reads. Use Excel's whole-table sort and retain all metadata columns. Do not sort/edit the raw sheet after analysis without rerunning it.
+VBA sözlükleri ikili karşılaştırma kullanır. İsteğe bağlı Türkçe harf dönüşümü `I → ı` ve `İ → i` eşleştirmelerini açıkça uygular. Formüllü örnek, VBA seçeneklerinden bağımsız olarak her zaman harfe duyarlı `EXACT` karşılaştırması kullanır. Grup kimliği ilk kaynak satırını içerir (`GRP-000002`); tek bir analiz içinde benzersizdir, farklı dosyalar arasında genel bir kimlik değildir.
 
-## Workbook layout
+VBA çıktısındaki orijinal referanslar sıralamayla değişmez. Formül modu sabit kaynak satır numaralarını ve bu numaralarla kaynak değerlerini okuyan formülleri kullanır. Bütün tabloyu sıralayın ve kontrol sütunlarını koruyun. Ham veriyi sıraladıktan veya değiştirdikten sonra analizi yeniden çalıştırın.
 
-| Sheet | Role |
+## Çalışma kitabı düzeni
+
+| Sayfa | Görevi |
 |---|---|
-| `00_Baslangic` | Navigation and macro buttons after installation |
-| `01_Ham_Veri` | Source values, headers and display formats |
-| `02_Kriterler` | Per-column flags and VBA options |
-| `03_Kontrol` | Every source record plus audit metadata |
-| `04_Ozet` | Counts, duplicate ratio and reconciliation |
-| `05_Testler` | Actual desktop test status and benchmark results |
-| `06_Karsilastirma` | Created on demand for comparison |
+| `00_Baslangic` | Gezinme ve kurulumdan sonra makro düğmeleri |
+| `01_Ham_Veri` | Kaynak değerler, başlıklar ve hücre biçimleri |
+| `02_Kriterler` | Sütun bazında seçimler ve VBA seçenekleri |
+| `03_Kontrol` | Bütün kaynak kayıtları ve kontrol alanları |
+| `04_Ozet` | Sayılar, mükerrer oranı ve mutabakat |
+| `05_Testler` | Masaüstü test durumu ve performans sonuçları |
+| `06_Karsilastirma` | Gerektiğinde oluşturulan karşılaştırma sayfası |
 
-The workbook uses a restrained green palette, frozen headers, autofilters and full-row green/red conditional formatting. This is a desktop Excel UI, not a responsive website. Screenshots are intentionally not supplied: no desktop Excel render was captured in the build environment.
+Çalışma kitabında yeşil ağırlıklı sade bir tasarım, sabitlenmiş başlıklar, otomatik filtreler ve bütün satırı renklendiren yeşil/kırmızı koşullu biçimlendirme kullanılır. Geliştirme ortamında masaüstü Excel görüntüsü alınamadığından uygulama ekran görüntüsü sunulmamıştır.
 
-## Validation
+## Test ve doğrulama
 
-See [the report](docs/VALIDATION.md) and [desktop acceptance checklist](tests/ACCEPTANCE.md). CI verifies ZIP/XML structure, expected worksheets, formulas, absence of external links and macro binaries in the XLSX, and module files. **CI does not run Excel, compile VBA or establish behavioral correctness.**
+[Doğrulama raporunu](docs/DOGRULAMA.md) ve [masaüstü kabul kontrollerini](tests/KABUL_KONTROLLERI.md) inceleyin. GitHub Actions iş akışı ZIP/XML yapısını, beklenen sayfaları, formülleri, dış bağlantı ve makro ikilisi bulunmamasını ve modül dosyalarını kontrol eder. **Bu işlem Excel'i çalıştırmaz, VBA'yı derlemez ve uygulama davranışının doğruluğunu kanıtlamaz.**
 
-Run `TestleriCalistir` for matching assertions. `PerformansOlc` measures the array engine at 500, 5,000, 20,000 and 50,000 rows on your computer and writes seconds to the workbook. It excludes import, formatting, full Excel interaction, and export; measure those separately with the acceptance checklist. No measured latency or UI responsiveness guarantee is claimed.
+Eşleştirme kontrolleri için `TestleriCalistir` çalıştırın. `PerformansOlc`, motoru bilgisayarınızda 500, 5.000, 20.000 ve 50.000 satırla ölçüp süreleri saniye olarak kaydeder. İçe aktarma, biçimlendirme, Excel arayüzü ve dışa aktarma bu ölçüme dahil değildir; bunları kabul listesiyle ayrıca ölçün. Ölçülmüş bir hız veya arayüz yanıt süresi garantisi verilmez.
 
-## Data handling
+## Veri güvenliği
 
-All application processing happens inside Excel. The VBA has no network calls, telemetry or external AI dependencies. Imported sources are opened read-only, with macro execution disabled and link updates disabled. Existing source files are never saved by the importer. Treat untrusted workbooks according to organizational policy; this is not an Excel security sandbox. Formula-looking strings are written as literals.
+Uygulama işlemleri Excel içinde gerçekleşir. VBA ağ çağrısı, telemetri veya harici yapay zekâ servisi kullanmaz. Kaynak dosyalar salt okunur olarak, makro çalıştırma ve bağlantı güncelleme kapalı biçimde açılır. İçe aktarma kaynak dosyayı kaydetmez. Güvenilmeyen çalışma kitapları için kurumunuzun politikalarını izleyin; uygulama bir güvenli çalıştırma ortamı sağlamaz. Formül gibi görünen metinler düz metin olarak yazılır.
 
-The repository sample is independently generated synthetic data, not the user's uploaded workbook. No real user data is committed. Use local storage if you do not want Excel/OneDrive autosave to synchronize files. Local processing does not automatically establish regulatory compliance.
+Depodaki örnek bağımsız üretilmiş sentetik veridir; kullanıcının yüklediği çalışma kitabı değildir. Gerçek kullanıcı verisi depoya eklenmez. Excel/OneDrive otomatik kaydının dosyaları eşitlemesini istemiyorsanız yerel klasör kullanın. Yerel işleme otomatik mevzuat uyumluluğu anlamına gelmez.
 
-## Limitations and next steps
+## Sınırlamalar ve sonraki geliştirmeler
 
-- Macro installation is manual because no Excel/VBA compiler is available here; a ready-to-run XLSM is **not** supplied.
-- Formula sample has fixed bounds. Arbitrary file sizes require VBA. VBA results need explicit refresh after any edits.
-- Excel/VBA operations are synchronous. 50,000-row execution and cancellation behavior have not been validated; 64-bit Excel is recommended.
-- Source imports preserve values and cell formats, not entire source workbook semantics. Trailing formatted-only rows are excluded; interior blank rows are retained.
-- Formula keys are constrained by Excel's 32,767-character cell limit. VBA dictionary keys are not stored in worksheet cells.
-- CSV import uses Excel's built-in import UI. No drag/drop upload, web themes or live web demo apply to this Excel-only edition.
-- Planned after validation: signed VBA release, automated invalidation events, richer import preview and a tested packaged XLSM.
+- Bu ortamda Excel/VBA derleyicisi bulunmadığı için makro kurulumu elle yapılır; çalıştırılmaya hazır XLSM sunulmamıştır.
+- Formüllü örnek sabit aralıklara bağlıdır. Farklı veri büyüklükleri VBA gerektirir. VBA sonuçları her değişiklikten sonra açıkça yenilenmelidir.
+- Excel/VBA işlemleri eşzamanlıdır. 50.000 satır çalıştırma ve iptal davranışı doğrulanmamıştır; 64 bit Excel önerilir.
+- İçe aktarma değerleri ve hücre biçimlerini korur. Kaynak kitabın tüm özelliklerini kopyalamaz. Sondaki yalnızca biçimlendirilmiş satırlar alınmaz; iç boş satırlar korunur.
+- Formül anahtarları Excel'in hücre başına 32.767 karakter sınırına tabidir. VBA sözlük anahtarları hücrelere yazılmaz.
+- CSV yükleme Excel'in yerleşik içe aktarma arayüzünü kullanır. Bu sürüm masaüstü Excel içindir; web demosu bulunmaz.
+- Doğrulama sonrasında planlananlar: imzalı VBA sürümü, değişikliklerde otomatik geçersizleştirme, ayrıntılı veri önizlemesi ve test edilmiş XLSM paketi.
 
-## Repository
+## Depo yapısı
 
 ```text
-vba/                    VBA application and self-tests
- deliverables/          Formula workbook (synthetic sample)
- docs/                  Validation record
- tests/                 Excel acceptance checklist
- .github/workflows/     Artifact integrity CI
+vba/                    VBA uygulaması ve motor testleri
+deliverables/           Formüllü çalışma kitabı ve sentetik örnek
+docs/                   Doğrulama raporu ve dosya kontrol sonuçları
+tests/                  Excel kabul kontrol listesi
+.github/workflows/     Dosya bütünlüğü iş akışı
 ```
 
-## License
+Dosya yolları, VBA modül/prosedür adları ve Excel'in dosya içinde kullandığı İngilizce işlev adları teknik uyumluluk için korunur. VBA dosyaları farklı Windows kod sayfalarında içe aktarılabilsin diye ASCII biçimindedir; kullanıcı mesajlarındaki Türkçe harfler `ChrW` ile oluşturulur. Kod açıklamaları bu nedenle Türkçe, ASCII yazımlıdır.
 
-No open-source license is granted yet. Copyright remains with the repository owner. A license can be selected before public distribution.
+## Lisans
+
+Henüz açık kaynak lisansı verilmemiştir. Telif hakları depo sahibine aittir. Kamuya dağıtımdan önce uygun bir lisans seçilebilir.
