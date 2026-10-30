@@ -1,0 +1,28 @@
+{
+  "Duplicate_Audit_Studio.xlsx": {
+    "zip_xml": "PASS",
+    "formula_tokenization": 6300,
+    "cached_metrics": [
+      370,
+      180,
+      90,
+      100,
+      90
+    ],
+    "source_values_preserved": 370,
+    "sha256": "91ad79f9b202e262e369c699493947950480e180cd532ae33f79790684495572"
+  },
+  "Sentetik_Dosya_Analizi.xlsx": {
+    "zip_xml": "PASS",
+    "formula_tokenization": 6300,
+    "cached_metrics": [
+      370,
+      180,
+      90,
+      100,
+      90
+    ],
+    "source_values_preserved": 370,
+    "sha256": "6d4acfa5914dbf62269c55e522bf12ed3c47d5408101275f5a4d34af0a758c7c"
+  }
+}
