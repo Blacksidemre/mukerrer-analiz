@@ -4,7 +4,7 @@
 
 - Both generated XLSX archives opened and passed ZIP integrity and XML parsing.
 - Six expected sheets, filters, conditional row colors, and source-row metadata verified structurally.
-- 6,301 formulas per dynamic workbook tokenized successfully. This checks syntax structure only; it is not Excel calculation.
+- 6,300 formulas per dynamic workbook tokenized successfully. This checks syntax structure only; it is not Excel calculation.
 - 370 source records retained; cached control values compared to all source columns without differences.
 - Independently grouped supplied synthetic records using the four initial criteria: **180 unique, 90 original, 100 surplus duplicates, 90 repeated groups**. Reconciliation: **370 = 180 + 90 + 100**.
 - Formula caches carry these expected results. The cache was authored during workbook generation and is **not evidence of Excel executing formulas**.
