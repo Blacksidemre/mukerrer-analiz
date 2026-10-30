@@ -10,7 +10,7 @@
       90
     ],
     "source_values_preserved": 370,
-    "sha256": "91ad79f9b202e262e369c699493947950480e180cd532ae33f79790684495572"
+    "sha256": "b52bc896ada90ab0a15bb7d7a416cb8fc43fa0e7c4fc42f9b879eb8ac351f5b5"
   },
   "Sentetik_Dosya_Analizi.xlsx": {
     "zip_xml": "PASS",
@@ -23,6 +23,6 @@
       90
     ],
     "source_values_preserved": 370,
-    "sha256": "6d4acfa5914dbf62269c55e522bf12ed3c47d5408101275f5a4d34af0a758c7c"
+    "sha256": "042ed50a49b7d3f10ccd7d5709a8f9b55a3c7920f1d7c9f1eefb80caf8b93f2e"
   }
 }
