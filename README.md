@@ -2,7 +2,7 @@
 
 **Excel LTSC 2024 içinde, kendi tablo ve sütunlarınızla çok kriterli mükerrer analizi.**
 
-[![Çalışma kitabı bütünlüğü](https://github.com/Blacksidemre/m-kerrer-analiz/actions/workflows/integrity.yml/badge.svg)](https://github.com/Blacksidemre/m-kerrer-analiz/actions/workflows/integrity.yml)
+[![Çalışma kitabı bütünlüğü](https://github.com/Blacksidemre/mukerrer-analiz/actions/workflows/integrity.yml/badge.svg)](https://github.com/Blacksidemre/mukerrer-analiz/actions/workflows/integrity.yml)
 
 [Dinamik Excel'i indir](deliverables/Duplicate_Audit_Studio.xlsx) · [Kullanım rehberi](README.tr.md) · [Deneme verisi](deliverables/Ornek_Ham_Veri.xlsx) · [Doğrulama](docs/DOGRULAMA.md)
 
