@@ -1,115 +1,82 @@
-# Duplicate Audit Studio · Excel Sürümü
+# Duplicate Audit Studio · Dinamik Formüllü Excel
 
-**Microsoft Excel LTSC 2024 içinde çok kriterli, kesin ve izlenebilir mükerrer kayıt analizi.**
+**Excel LTSC 2024 içinde, kendi tablo ve sütunlarınızla çok kriterli mükerrer analizi.**
 
 [![Çalışma kitabı bütünlüğü](https://github.com/Blacksidemre/m-kerrer-analiz/actions/workflows/integrity.yml/badge.svg)](https://github.com/Blacksidemre/m-kerrer-analiz/actions/workflows/integrity.yml)
 
-[Kullanım rehberi](README.tr.md) · [Excel kitabını indir](deliverables/Duplicate_Audit_Studio.xlsx) · [Doğrulama raporu](docs/DOGRULAMA.md)
+[Dinamik Excel'i indir](deliverables/Duplicate_Audit_Studio.xlsx) · [Kullanım rehberi](README.tr.md) · [Deneme verisi](deliverables/Ornek_Ham_Veri.xlsx) · [Doğrulama](docs/DOGRULAMA.md)
 
-Veri analistleri için hazırlanan bu çözüm, hiçbir kaydı silmeden mükerrerleri belirler. Sütunları 1/0 değerleriyle seçin, satır renklerinden kayıt durumlarını inceleyin, her grubun ilk kaynak kaydına ulaşın ve denetlenebilir bir Excel raporu oluşturun. Uygulama yalnızca Excel formülleri ve VBA ile çalışır.
+Ham veri bir **Excel tablosudur**. Tabloya eklenen satırlar ve sütunlar formüllerin kapsamına girer. Kriter sayfasında mevcut başlıklar otomatik listelenir. Ad, tutar, icra dairesi, dosya numarası veya başka alanları seçip 1/0 değerleriyle analize dahil edebilirsiniz. Orijinaller yeşil, fazladan mükerrerler kırmızı gösterilir; kaynak kayıtlar silinmez.
 
-> **Sürüm durumu:** Formüllü çalışma kitabı ve VBA kaynakları teslim edilmiştir. Geliştirme ortamında masaüstü Excel bulunmadığı için VBA çalıştırma, Excel formüllerinin yeniden hesaplanması, uçtan uca kullanım ve 50.000 satır performansı Excel LTSC 2024 üzerinde doğrulanmayı beklemektedir. Bu bir **inceleme sürümüdür**. XLSX dosyası gömülü makro içermez; XLSM oluşturmak için iki VBA modülünü içe aktarın.
+> **Doğrulama durumu:** Dosya yapısı, formüllerin sözdizimi ve bağımsız eşleştirme örnekleri kontrol edildi. Bu ortamda masaüstü Excel bulunmadığından Excel LTSC 2024 üzerinde yeniden hesaplama ve kullanıcı akışı henüz çalıştırılmadı. Formül önbellekleri Excel tarafından hesaplanmış test sonuçları değildir.
 
-## Çalışma biçimleri
+## Hemen kullanın
 
-| Çalışma biçimi | Dosya veya işlem | Yeniden hesaplama | Kapsam |
-|---|---|---|---|
-| Formüllü örnek | `deliverables/Duplicate_Audit_Studio.xlsx` | Kriter değişince Excel formülleri yeniden hesaplanır | Sabit 370 satır ve 12 sütun |
-| VBA analizi | `vba/DuplicateAudit.bas` | Veri/kriter değişince `AnalizEt` çalıştırılır | En fazla 50.000 satır / 100 sütun; performans ölçülmedi |
-| VBA testleri | `vba/AuditTests.bas` | Excel içinde ayrıca çalıştırılır | Doğrulama kontrolleri ve dört veri büyüklüğünde ölçüm |
-| Dışa aktarma | `ExcelAktar` | Statik değerler; yeniden analiz yapılmaz | Analiz edilen bütün kayıtlar |
+1. `Duplicate_Audit_Studio.xlsx` dosyasını Excel LTSC 2024'te açın. **Hesaplama Seçenekleri → Otomatik** seçin; Ctrl+Alt+F9 ile tam hesaplatın.
+2. `01_Ham_Veri` sayfasındaki **HamVeri** tablosuna başlıklarınızla birlikte veriyi yerleştirin. Eski kayıtları önce temizleyin. **Tablo Tasarımı → Tabloyu Yeniden Boyutlandır** ile sınırın yeni verinizi tam kapsadığını doğrulayın.
+3. `02_Kriterler` sayfasının solunda güncel başlıkları görün. Sağdaki sarı **Sütun / Etkin / Tür** seçim tablosunda başlığı açılır listeden seçin, Etkin değerini **1** veya **0** yapın.
+4. `03_Kontrol` sayfasını inceleyin. Durum, grup kimliği ve metin aramasıyla filtreleyin; bir sütun seçerek sıralayın.
+5. `04_Ozet` sayfasında **Toplam = Tekil + Orijinal + Fazladan mükerrer** mutabakatını kontrol edin.
 
-Formül modunda kesin karşılaştırma sayısı satır sayısının karesiyle artar. Bu örneği 50.000 satıra genişletmeyin. VBA motoru sözlük yapısıyla çalışır; beklenen işlem miktarı satır sayısı × seçili sütun sayısıyla orantılıdır. Bu algoritmanın özelliğidir; ölçülmüş hız iddiası değildir.
+**Kriter seçimi neden sütun adına bağlı?** Sütunların yeri değişince seçimlerin başka alanlara kaymaması için. Yeni başlıklar soldaki listede otomatik görünür; sağdaki seçim tablosuna eklenene kadar pasiftir. Daha önce seçilmiş bir başlık silinir veya değişirse analiz durur ve seçim düzeltmenizi ister. Başlığı aynı kalan bir sütunun seçimi korunur; yeni veri yüklerken önceki seçimleri yine gözden geçirin.
 
-## Hızlı başlangıç
+## Örnek seçimler
 
-1. XLSX dosyasını Excel LTSC 2024 ile açın. **Formüller → Hesaplama Seçenekleri → Otomatik** seçin. **Ctrl+Alt+F9** ile tam hesaplatın.
-2. `02_Kriterler` sayfasında `B7:B18` hücrelerini 1 veya 0 yapın. Başlangıç seçimi: dosya kodu, borçlu kodu, ürün türü ve anapara.
-3. `03_Kontrol` sayfasında başlık filtreleriyle durum veya grup seçin. Sıralarken **bütün tabloyu** sıralayın; tek sütunu bağımsız sıralamayın.
-4. `04_Ozet` sonucunu kontrol edin: **370 = 180 tekil + 90 orijinal + 100 fazladan mükerrer**. Mükerrer grup sayısı **90**.
+| Amaç | Etkin yapılacak alanlar | Önerilen tür |
+|---|---|---|
+| Aynı adlı kayıtlar | Ad | Kesin; gerekirse boşluk ve harf seçenekleri |
+| Aynı tutarlı kayıtlar | Tutar | Gerçek sayılarda Kesin; Türkçe sayı metinlerinde Türkçe tutar |
+| Aynı icra dosyaları | İcra Dairesi + Dosya Numarası | Kesin |
+| Aynı kişi ve tutar | Ad + Tutar | Her alanın gerçek türüne göre |
+| Aynı dosya numarası | Dosya Numarası | Kesin; kimlik alanlarını kaynakta metin tutun |
 
-## VBA kurulumu
+## Veri türleri ve normalizasyon
 
-Yeni dosyaları yüklemek, seçenekleri uygulamak, büyük veri kümelerini analiz etmek ve rapor almak için:
+- **Kesin:** Metin ve sayı farklıdır. Metin `001`, metin `1` ve sayı `1` ayrı anahtarlar üretir. Harf ve boşluklar varsayılan olarak korunur.
+- **Metin:** Sayı ve metin, Excel'in metinsel gösterimleri üzerinden karşılaştırılır. Sayı `1` ile metin `1` eşleşir; metin `001` ayrı kalır.
+- **Türkçe tutar:** Sayısal hücreleri korur; `1.234,50` gibi metinleri virgül ondalık, nokta binlik ayracıyla sayıya çevirir. Yabancı sayı biçimlerinde kullanmayın. Dönüştürülemeyen değer analizi durdurur. Para birimi yazılarını önce temizleyin. Tutarlar yuvarlanmaz.
+- **Fazla boşlukları temizle:** `02_Kriterler!L7=1`; metinlerin kenarlarındaki normal boşlukları kaldırır ve içteki tekrarlı normal boşlukları teke indirir. Sekme ve bölünemez boşlukları temizlemez.
+- **Türkçe harf farkını kaldır:** `L8=1`; `I → ı`, `İ → i` dönüşümleri uygulanır ve küçük harfe çevrilir.
+- **Tarih:** Excel'in gerçek tarih hücreleri seri sayıdır. Aynı seri sayı ile eşdeğerdir. Tarih gibi görünen metinler kendiliğinden tarihe çevrilmez. Sonuç sayfası kaynak hücre biçimlerini dinamik kopyalayamadığından tarihleri seri sayı olarak gösterebilir; ham verideki tarih biçimi korunur.
 
-1. Çalışma kitabını yerel bir klasöre **Excel Makro Etkin Çalışma Kitabı (.xlsm)** olarak kaydedin.
-2. **Alt+F11 → Dosya → Dosya Al** yoluyla `vba/` klasöründeki iki `.bas` dosyasını içe aktarın. VBA düzenleyicisi İngilizceyse menü adları **File → Import File** şeklindedir.
-3. VBA düzenleyicisinde **Hata Ayıkla → VBAProject'i Derle** komutunu çalıştırın; İngilizce menü karşılığı **Debug → Compile VBAProject**. Excel'e dönüp **Alt+F8 → Kurulum** çalıştırın.
-4. Yalnızca incelediğiniz makroları kurumunuzun politikalarına göre etkinleştirin. Uygulama, VBA proje nesne modeline güven erişimi gerektirmez.
-5. Önce **TestleriCalistir**, ardından **PerformansOlc** çalıştırın. Sonuçlar `05_Testler` sayfasına yazılır.
+Boş hücre ve boş metin eşleşir. Tamamen boş ara satırlar tablo içindeyse kayıt sayılır; seçilen alanları boş olan kayıtlar aynı grupta toplanabilir. Excel hata değerleri analizi durdurur. Unicode bileşim normalizasyonu yapılmaz. Excel'in 15 anlamlı basamak sınırı nedeniyle önceden kaybolmuş kimlik basamakları geri getirilemez.
 
-Kurulum makrosu altı işlevsel düğme oluşturur. Diğer makrolara Alt+F8 ile ulaşılır. Kurulumdan sonra dosyanın adını değiştirirseniz düğme bağlantılarını güncellemek için `Kurulum` işlemini yeniden çalıştırın.
+Anahtarlar tür + uzunluk + değer bileşenleriyle oluşturulur; `AB + C` ile `A + BC` eşleşmez. Karşılaştırmada joker karakterler normal karakterdir. `TEKİL`, grubunda tek kayıttır; `ORİJİNAL`, tekrarlı grubun ham tablodaki ilk kaydı; `MÜKERRER` sonraki kayıtlarıdır. Grup kimliği ilk kaynak satırından türetilir. Sonuç görünümünün filtre/sıralama ayarları bu referansı değiştirmez. Ham tabloyu sıralamak ise kaynak sırasını değiştirdiği için orijinali yeniden belirler.
 
-## Dosya yükle → kriter seç → analiz et → incele → dışa aktar
+## Dinamik aralıkların sınırları
 
-- **DosyaYukle:** Bir XLSX dosyası ve sayfa numarası seçin. İlk satır başlık olmalıdır. Mevcut veri onayınızdan sonra değiştirilir; eski sonuçlar temizlenir. Yeni veri içindeki boş ara satırlar dahil hiçbir kayıt silinmez. Boş veya tekrarlı başlıklara benzersiz adlar verilir.
-- **CSV:** Excel'in **Veri → Metin/CSV'den** komutunu kullanın. UTF-8 veya Windows-1254 kodlamasını ve virgül/noktalı virgül/sekme ayracını seçin. Kod sütunlarını **Metin** olarak yükleyin, XLSX olarak kaydedip içe aktarın. Makro kodlamayı tahmin etmez ve kod sütunlarını kendiliğinden sayıya dönüştürmez.
-- **02_Kriterler:** Yüklenen her sütunun yanında 1/0 seçimi bulunur. Yalnızca VBA için `F7`, metnin kenarlarındaki ASCII boşluklarını temizler; `F8`, Türkçe büyük/küçük harf farkını kaldırır. Varsayılan kesin eşleşmedir.
-- **AnalizEt:** Bütün kayıtları etkin kriterlerle analiz eder. Hiç kriter seçilmemesi hatadır. Her kayıtta durum, grup, eşleşme adedi, orijinal referansı ve kaynak satır numarası yer alır. Kaynak satırları başlıktan sonra, 2'den başlar.
-- **GrubuIncele:** Tam grup kimliğiyle filtreler. Boş giriş filtreyi kaldırır. Başlık menüleri durum filtrelemeyi ve metin aramasını da destekler.
-- **YanYanaKarsilastir:** Seçilen grubun en fazla 20 kaydını `06_Karsilastirma` sayfasında yan yana gösterir. Grubun tamamı sonuç tablosunda bulunur.
-- **ExcelAktar:** Dört analiz sayfasını yalnızca değerlerden oluşan anlık rapor olarak kaydeder. Veri/kriter değişikliğinden sonra analizi yeniden çalıştırdığınızı doğrulayın. Filtreler ve koşullu renkler korunur. Dışa aktarılan kriterlerin değiştirilmesi raporu yeniden hesaplamaz.
+- En fazla **2.000 veri satırı ve 100 sütun** desteklenir. Aşımda açık mesajla analiz durur. Bu sınır ölçülmüş hız garantisi değildir; tam karşılaştırmaların yükü satır sayısının karesiyle artar.
+- Dinamik kapsam, **HamVeri tablosunun içidir**. Tablo dışına yapıştırılmış veriler dahil olmaz. Özellikle daha küçük veriyle değiştirirken eski hücreleri temizleyip tabloyu küçültün.
+- Kriterler için 100 seçim satırı vardır. Aynı başlığı iki satırda kullanmak hatadır. Etkin bir seçimde bulunmayan veya boş başlık kullanmak hatadır.
+- Başlıklar Excel tablosunda benzersiz ve dolu olmak zorundadır. Excel boş/tekrarlı başlıkları kendisi adlandırır; analiz bu son adları kullanır.
+- Excel'in dinamik dizi sonuçları **taşma alanı** kullanır. Kriter listesinin ve sonuçların üzerine veri yazmayın; engellenirse `#TAŞMA!` hatası oluşur.
+- Tek bir satırın eşleştirme anahtarı 32.767 karakteri aşarsa analiz durur. Kaynak hücre değerleri değiştirilmez.
+- Sonuçlar hücre formülleridir. Görünüm kontrollerini kullanın; taşan sonuç aralığını elle düzenlemeyin veya Excel'in yerleşik sıralamasıyla değiştirmeyin.
 
-## Eşleştirme kuralları
+## Sayfalar
 
-**TEKİL**, grubunda tek olan kayıttır. **ORİJİNAL**, tekrarlı grubun kaynak dosyadaki ilk kaydıdır. **MÜKERRER**, aynı grubun sonraki kayıtlarıdır. Orijinal belirlenirken kaynak sırası kullanılır.
-
-Anahtarlar veri türünü ve her değerin uzunluğunu içerir. `AB + C` ile `A + BC` farklıdır. Metin ve sayı ayrıdır; metin `001`, metin `1` ile eşleşmez. Boş hücre ile boş metin eşleşir. Joker karakterler normal karakter olarak değerlendirilir. Varsayılan karşılaştırma harf ve boşluk farklarını korur. Yaklaşık eşleştirme, tutar yuvarlama veya Unicode bileşim normalizasyonu yapılmaz.
-
-Excel tarihleri seri sayılardır; tarih biçimi ayrı bir veri türü oluşturmaz. `0000` biçimiyle gösterilen sayı `1`, yine sayı `1` değeridir. Kimlik alanlarını içe aktarmadan önce metin olarak tutun. Excel'in 15 anlamlı basamak sınırı nedeniyle kaynakta kaybolmuş sayısal basamaklar geri getirilemez. Formüllü hücreler mevcut değerleriyle alınır; kaynak kitabı önceden hesaplatıp kaydedin. Kaynak formülleri, açıklamalar, grafikler, birleştirilmiş düzenler ve bağlantılar çalıştırılabilir nesneler olarak arşivlenmez.
-
-VBA sözlükleri ikili karşılaştırma kullanır. İsteğe bağlı Türkçe harf dönüşümü `I → ı` ve `İ → i` eşleştirmelerini açıkça uygular. Formüllü örnek, VBA seçeneklerinden bağımsız olarak her zaman harfe duyarlı `EXACT` karşılaştırması kullanır. Grup kimliği ilk kaynak satırını içerir (`GRP-000002`); tek bir analiz içinde benzersizdir, farklı dosyalar arasında genel bir kimlik değildir.
-
-VBA çıktısındaki orijinal referanslar sıralamayla değişmez. Formül modu sabit kaynak satır numaralarını ve bu numaralarla kaynak değerlerini okuyan formülleri kullanır. Bütün tabloyu sıralayın ve kontrol sütunlarını koruyun. Ham veriyi sıraladıktan veya değiştirdikten sonra analizi yeniden çalıştırın.
-
-## Çalışma kitabı düzeni
-
-| Sayfa | Görevi |
+| Sayfa | İçerik |
 |---|---|
-| `00_Baslangic` | Gezinme ve kurulumdan sonra makro düğmeleri |
-| `01_Ham_Veri` | Kaynak değerler, başlıklar ve hücre biçimleri |
-| `02_Kriterler` | Sütun bazında seçimler ve VBA seçenekleri |
-| `03_Kontrol` | Bütün kaynak kayıtları ve kontrol alanları |
-| `04_Ozet` | Sayılar, mükerrer oranı ve mutabakat |
-| `05_Testler` | Masaüstü test durumu ve performans sonuçları |
-| `06_Karsilastirma` | Gerektiğinde oluşturulan karşılaştırma sayfası |
+| `00_Baslangic` | Kullanım adımları ve sınırlar |
+| `01_Ham_Veri` | HamVeri adlı kaynak Excel tablosu; canlı satır renkleri |
+| `02_Kriterler` | Otomatik başlık listesi, sütun adına bağlı seçimler ve tür seçenekleri |
+| `03_Kontrol` | Dinamik sonuçlar, renkler, arama, filtre ve sıralama |
+| `04_Ozet` | Filtrelerden bağımsız metrikler ve mutabakat |
+| `05_Testler` | Kontrol adımları ve masaüstü test durumu |
+| `_Hesaplama` | Gizli yardımcı formüller |
 
-Çalışma kitabında yeşil ağırlıklı sade bir tasarım, sabitlenmiş başlıklar, otomatik filtreler ve bütün satırı renklendiren yeşil/kırmızı koşullu biçimlendirme kullanılır. Geliştirme ortamında masaüstü Excel görüntüsü alınamadığından uygulama ekran görüntüsü sunulmamıştır.
+[Formül dökümü](docs/FORMULLER.md) teknik inceleme içindir. Çalışma kitabında LET, FILTER, XLOOKUP, XMATCH, BYROW, LAMBDA, CHOOSECOLS, HSTACK, SORT ve dinamik diziler kullanılır. Hedef Excel LTSC 2024'tür; eski Excel sürümleri desteklenmez.
 
-## Test ve doğrulama
+## Raporu kaydetme ve VBA seçeneği
 
-[Doğrulama raporunu](docs/DOGRULAMA.md) ve [masaüstü kabul kontrollerini](tests/KABUL_KONTROLLERI.md) inceleyin. GitHub Actions iş akışı ZIP/XML yapısını, beklenen sayfaları, formülleri, dış bağlantı ve makro ikilisi bulunmamasını ve modül dosyalarını kontrol eder. **Bu işlem Excel'i çalıştırmaz, VBA'yı derlemez ve uygulama davranışının doğruluğunu kanıtlamaz.**
+Dinamik sürümü normal XLSX olarak kaydetmeniz yeterlidir. Bu dosyada makro veya otomatik statik rapor düğmesi yoktur. Statik rapor gerekiyorsa sonuçları ayrı bir kitaba **Özel Yapıştır → Değerler** ile aktarın; bu kopya kriter değişikliklerini takip etmez.
 
-Eşleştirme kontrolleri için `TestleriCalistir` çalıştırın. `PerformansOlc`, motoru bilgisayarınızda 500, 5.000, 20.000 ve 50.000 satırla ölçüp süreleri saniye olarak kaydeder. İçe aktarma, biçimlendirme, Excel arayüzü ve dışa aktarma bu ölçüme dahil değildir; bunları kabul listesiyle ayrıca ölçün. Ölçülmüş bir hız veya arayüz yanıt süresi garantisi verilmez.
+Önceki VBA akışı ayrı tutulmuştur: [VBA taban kitabı](deliverables/Duplicate_Audit_Studio_VBA_Taban.xlsx). Makroları **yalnızca bu taban kitaba** kurun; dinamik formüllü kitap farklı hücre düzeni kullanır ve eski makrolarla uyumlu değildir. VBA tabanını `.xlsm` kaydedip `vba/DuplicateAudit.bas` ile `vba/AuditTests.bas` modüllerini içe aktarın; `Kurulum` çalıştırın. Veri/kriter değişince `AnalizEt` gerekir. VBA motorundaki 50.000 satır sınırı ve testler de masaüstü Excel'de doğrulanmayı bekler. VBA tabanındaki eski formüllü örnek 370 satır/12 sütuna sabittir.
 
-## Veri güvenliği
+## Test, güvenlik ve lisans
 
-Uygulama işlemleri Excel içinde gerçekleşir. VBA ağ çağrısı, telemetri veya harici yapay zekâ servisi kullanmaz. Kaynak dosyalar salt okunur olarak, makro çalıştırma ve bağlantı güncelleme kapalı biçimde açılır. İçe aktarma kaynak dosyayı kaydetmez. Güvenilmeyen çalışma kitapları için kurumunuzun politikalarını izleyin; uygulama bir güvenli çalıştırma ortamı sağlamaz. Formül gibi görünen metinler düz metin olarak yazılır.
+[Doğrulama raporu](docs/DOGRULAMA.md), [formül kabul listesi](tests/formul/KABUL_KONTROLLERI.md) ve [VBA kabul listesi](tests/KABUL_KONTROLLERI.md) yapılan ve bekleyen kontrolleri ayırır. GitHub Actions, çalışma kitaplarının ZIP/XML yapısını kontrol eder; Excel veya VBA çalıştırmaz.
 
-Depodaki örnek bağımsız üretilmiş sentetik veridir; kullanıcının yüklediği çalışma kitabı değildir. Gerçek kullanıcı verisi depoya eklenmez. Excel/OneDrive otomatik kaydının dosyaları eşitlemesini istemiyorsanız yerel klasör kullanın. Yerel işleme otomatik mevzuat uyumluluğu anlamına gelmez.
+Uygulama Excel içinde çalışır; analiz sunucusu, telemetri ve harici AI servisi yoktur. OneDrive eşitlemesi ayrı bir Excel/Windows ayarıdır. Yerel işleme otomatik mevzuat uyumluluğu sağlamaz. Örnek dosyalar sentetiktir. Kullanıcının yüklediği dosya depoya eklenmez.
 
-## Sınırlamalar ve sonraki geliştirmeler
-
-- Bu ortamda Excel/VBA derleyicisi bulunmadığı için makro kurulumu elle yapılır; çalıştırılmaya hazır XLSM sunulmamıştır.
-- Formüllü örnek sabit aralıklara bağlıdır. Farklı veri büyüklükleri VBA gerektirir. VBA sonuçları her değişiklikten sonra açıkça yenilenmelidir.
-- Excel/VBA işlemleri eşzamanlıdır. 50.000 satır çalıştırma ve iptal davranışı doğrulanmamıştır; 64 bit Excel önerilir.
-- İçe aktarma değerleri ve hücre biçimlerini korur. Kaynak kitabın tüm özelliklerini kopyalamaz. Sondaki yalnızca biçimlendirilmiş satırlar alınmaz; iç boş satırlar korunur.
-- Formül anahtarları Excel'in hücre başına 32.767 karakter sınırına tabidir. VBA sözlük anahtarları hücrelere yazılmaz.
-- CSV yükleme Excel'in yerleşik içe aktarma arayüzünü kullanır. Bu sürüm masaüstü Excel içindir; web demosu bulunmaz.
-- Doğrulama sonrasında planlananlar: imzalı VBA sürümü, değişikliklerde otomatik geçersizleştirme, ayrıntılı veri önizlemesi ve test edilmiş XLSM paketi.
-
-## Depo yapısı
-
-```text
-vba/                    VBA uygulaması ve motor testleri
-deliverables/           Formüllü çalışma kitabı ve sentetik örnek
-docs/                   Doğrulama raporu ve dosya kontrol sonuçları
-tests/                  Excel kabul kontrol listesi
-.github/workflows/     Dosya bütünlüğü iş akışı
-```
-
-Dosya yolları, VBA modül/prosedür adları ve Excel'in dosya içinde kullandığı İngilizce işlev adları teknik uyumluluk için korunur. VBA dosyaları farklı Windows kod sayfalarında içe aktarılabilsin diye ASCII biçimindedir; kullanıcı mesajlarındaki Türkçe harfler `ChrW` ile oluşturulur. Kod açıklamaları bu nedenle Türkçe, ASCII yazımlıdır.
-
-## Lisans
-
-Henüz açık kaynak lisansı verilmemiştir. Telif hakları depo sahibine aittir. Kamuya dağıtımdan önce uygun bir lisans seçilebilir.
+Henüz açık kaynak lisansı verilmemiştir; telif hakları depo sahibine aittir. Teknik dosya/prosedür adları ve Excel'in dosya içinde kullandığı İngilizce işlev adları uyumluluk için korunur.

@@ -1,28 +1,25 @@
 {
-  "Duplicate_Audit_Studio.xlsx": {
-    "zip_xml_kontrolu": "BAŞARILI",
-    "ayristirilan_formul_sayisi": 6300,
-    "onbellekteki_gostergeler": [
-      370,
-      180,
-      90,
-      100,
-      90
-    ],
-    "korunan_kaynak_kayit_sayisi": 370,
-    "sha256": "222dd6bb49eb11b73aac96894e3446b51cae0103bcb4a1bd868ee9626fea2629"
-  },
-  "Sentetik_Dosya_Analizi.xlsx": {
-    "zip_xml_kontrolu": "BAŞARILI",
-    "ayristirilan_formul_sayisi": 6300,
-    "onbellekteki_gostergeler": [
-      370,
-      180,
-      90,
-      100,
-      90
-    ],
-    "korunan_kaynak_kayit_sayisi": 370,
-    "sha256": "042ed50a49b7d3f10ccd7d5709a8f9b55a3c7920f1d7c9f1eefb80caf8b93f2e"
+  "referans_senaryo_sayisi": 15,
+  "referans_senaryolari": "BAŞARILI",
+  "excel_motoru_calistirildi": false,
+  "kitaplar": {
+    "Duplicate_Audit_Studio.xlsx": {
+      "zip_xml": "BAŞARILI",
+      "formul_sayisi": 24,
+      "sayfa_sayisi": 7,
+      "sha256": "ab0a0a918a6af716bf9428550dcb4597379b90bf6df437a72ab902e9ef470b08"
+    },
+    "Duplicate_Audit_Studio_VBA_Taban.xlsx": {
+      "zip_xml": "BAŞARILI",
+      "formul_sayisi": 6300,
+      "sayfa_sayisi": 6,
+      "sha256": "222dd6bb49eb11b73aac96894e3446b51cae0103bcb4a1bd868ee9626fea2629"
+    },
+    "Ornek_Ham_Veri.xlsx": {
+      "zip_xml": "BAŞARILI",
+      "formul_sayisi": 0,
+      "sayfa_sayisi": 1,
+      "sha256": "e9a5dd045df7577630ac4537364465cbde7cc61801d2e8ee717d37af0a09d32b"
+    }
   }
 }

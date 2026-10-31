@@ -1,5 +1,7 @@
 # Excel LTSC 2024 masaüstü kabul kontrolleri — ÇALIŞTIRILMADI
 
+Bu liste yalnızca `../deliverables/Duplicate_Audit_Studio_VBA_Taban.xlsx` dosyasından oluşturulan VBA kitabı içindir. Dinamik formüllü sürüm için `formul/KABUL_KONTROLLERI.md` listesini kullanın.
+
 Excel sürümünü ve derleme numarasını, 32/64 bit bilgisini, işletim sistemini, işlemciyi, belleği ve test tarihini kaydedin. Çalışma kitabının bir kopyasını kullanın.
 
 - [ ] XLSX dosyasını tam hesaplatın: ad, değer, başvuru veya sıfıra bölme hatası olmamalı; sonuçlar 370/180/90/100/90 olmalı.

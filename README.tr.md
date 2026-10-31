@@ -1,52 +1,40 @@
-# Duplicate Audit Studio — Excel LTSC 2024
+# Kendi verinizle dinamik mükerrer analizi
 
-Uygulama yalnızca Excel formülleri ve VBA kullanır. Web uygulaması veya sunucu gerektirmez.
+1. [Duplicate_Audit_Studio.xlsx](deliverables/Duplicate_Audit_Studio.xlsx) dosyasını Excel LTSC 2024 ile açın. Makro gerekmez.
+2. **Formüller → Hesaplama Seçenekleri → Otomatik** seçin. İlk açılışta **Ctrl+Alt+F9** ile tam hesaplatın.
+3. `01_Ham_Veri` sayfasındaki eski tablo verilerini temizleyin. Kendi verinizi, başlıklar ilk satırda olacak şekilde aynı alana yapıştırın.
+4. **Tablo Tasarımı → Tabloyu Yeniden Boyutlandır** ile **HamVeri** tablosunun yeni verinin bütün satır ve sütunlarını tam kapsadığını doğrulayın. Daha küçük veri koyduysanız eski sütun ve satırları kapsamdan çıkarın. Tablo adını değiştirmeyin.
+5. `02_Kriterler` sayfasında güncel başlıklar solda otomatik listelenir. Sağdaki sarı seçim tablosunda **Sütun** alanından istediğiniz başlığı seçin, **Etkin** alanına **1** yazın. Hariç tutmak için **0** yazın. Önceki dosyadan kalan etkin başlıkları temizleyin veya 0 yapın.
+6. **Tür** varsayılan olarak **Kesin** kalsın. Metin biçimindeki Türkçe tutarları sayılarla eşleştirmek için **Türkçe tutar** seçebilirsiniz. Dosya numarası gibi kod alanlarında bu dönüşümü kullanmayın.
+7. `03_Kontrol` ve ham veri satırları kendiliğinden renklenir: **ORİJİNAL yeşil**, **MÜKERRER kırmızı**, **TEKİL nötr**. Sonuç sayfasındaki sarı kontrollerle filtreleyin, arayın ve sıralayın.
+8. `04_Ozet` sayfasındaki mutabakat farkı geçerli analizde **0** olmalıdır.
 
-**Teslimat durumu:** Formüllü XLSX ve içe aktarılabilir VBA kaynakları hazırdır. Bu ortamda Excel bulunmadığı için makrolar çalıştırılmadı; Excel yeniden hesaplama, kullanıcı akışı ve 50.000 satır performansı henüz doğrulanmadı. Dosyalar inceleme sürümüdür.
+## Sık kullanılan seçimler
 
-## Hemen deneyin
+- Yalnızca ada göre: **Ad = 1**, diğerleri 0.
+- Aynı ad ve tutar: **Ad = 1, Tutar = 1**.
+- Aynı icra dosyası: **İcra Dairesi = 1, Dosya Numarası = 1**.
+- Yalnızca tutara göre: **Tutar = 1**. Bu durumda farklı kişilerin aynı tutarı da aynı gruba girer; bu, seçtiğiniz kuralın sonucudur.
 
-1. `deliverables/Duplicate_Audit_Studio.xlsx` dosyasını Excel LTSC 2024 ile açın.
-2. Formüller → Hesaplama Seçenekleri → Otomatik seçin; Ctrl+Alt+F9 ile tam hesaplatın.
-3. `02_Kriterler` sayfasında B7:B18 hücrelerini 1/0 olarak değiştirin.
-4. `03_Kontrol` sayfasında satır renklerini ve grup filtrelerini inceleyin.
-5. `04_Ozet` sayfasını kontrol edin. Başlangıç sonucu: **370 = 180 tekil + 90 orijinal + 100 mükerrer**, 90 grup.
+[Örnek ham veri dosyası](deliverables/Ornek_Ham_Veri.xlsx) bu alanlarla deneme yapmanız içindir.
 
-Bu formüllü örnek 370 satır/12 sütuna sabittir. Yeni boyutlarda veri yüklemek için VBA kullanın. Büyük dosyalar için formülleri aşağıya kopyalamayın.
+## Neden seçim tablosunda başlık seçiyorum?
 
-## Makroları kurun
+Otomatik başlık listesinin yanındaki hücreleri doğrudan değiştirirsek sütun yerleri değiştiğinde önceki 1/0 seçimleri yanlış alanlara taşınabilir. Bu yüzden girişler ayrı bir **sütun adına bağlı seçim tablosunda** tutulur. Yeni başlıklar otomatik listelenir fakat siz seçene kadar pasiftir. Aynı adın seçimi sütun sırası değişse bile korunur. Başlık adı değişirse yeni adı seçmeniz gerekir.
 
-1. XLSX dosyasını **Farklı Kaydet → Excel Makro Etkin Çalışma Kitabı (.xlsm)** ile kaydedin.
-2. **Alt+F11 → Dosya → Dosya Al** üzerinden `vba/DuplicateAudit.bas` ve `vba/AuditTests.bas` dosyalarını alın.
-3. **Debug / Hata Ayıkla → Compile VBAProject** ile derleyin.
-4. Excel'e dönün; **Alt+F8 → Kurulum → Çalıştır** seçin. Ana sayfada altı işlem düğmesi oluşur.
-5. Önce **TestleriCalistir**, sonra **PerformansOlc** çalıştırın. Gerçek sonuçlar `05_Testler` sayfasına yazılır.
+## Dikkat edilecekler
 
-Kod incelemesi ve kurumunuzun makro politikası doğrultusunda etkinleştirin. Genel makro güvenliğini düşürmeyin. Uygulama VBA proje nesne modeline güven erişimi istemez. Dosyanın adını değiştirirseniz düğme bağlantıları için Kurulum'u yeniden çalıştırın.
+- Desteklenen üst sınır **2.000 kayıt / 100 sütun**; aşımda analiz durur. Bu bir hız garantisi değildir.
+- Dinamik kapsam tablonun içidir; tablo dışındaki veri analize girmez.
+- İçteki tamamen boş tablo satırları da kayıt sayılır. Boş seçili değerler birbirleriyle eşleşebilir.
+- Başında sıfır bulunan dosya numaralarını kaynakta **metin** tutun. Excel'de önceden kaybolmuş sıfırlar veya basamaklar geri getirilemez.
+- Tarihler kaynakta gerçek Excel tarihi olmalıdır; tarih metinleri otomatik dönüştürülmez. Sonuç sayfası tarihi seri sayı olarak gösterebilir.
+- Sonuç ve otomatik kriter listesi taşma alanıdır; bu alanlara yazmayın. `#TAŞMA!` görülürse engelleyen hücreleri temizleyin.
+- Sonuçların sıralama kontrolü referansı değiştirmez. Ham tabloyu sıralarsanız kaynak sırası değişir ve orijinal kayıt yeniden belirlenir.
+- Genel boşluk/harf seçenekleri `02_Kriterler!L7:L8` alanındadır. Boşluk temizleme içteki tekrarlı normal boşlukları da teke indirir.
 
-## Günlük kullanım
+## VBA kullanmak isterseniz
 
-**DosyaYukle → Kriterleri seç → AnalizEt → GrubuIncele → ExcelAktar**
+Dinamik kitaba eski VBA modüllerini kurmayın. Bunun için ayrı [VBA taban kitabını](deliverables/Duplicate_Audit_Studio_VBA_Taban.xlsx) kullanın: `.xlsm` kaydedin, Alt+F11 → Dosya Al ile iki `.bas` dosyasını ekleyin, projeyi derleyin ve Alt+F8 → Kurulum çalıştırın. Bu ayrı akışta kriter değişiminden sonra AnalizEt gerekir.
 
-- Kaynak `.xlsx` dosyasını ve veri sayfasının numarasını seçin. İlk satır başlık olmalıdır.
-- CSV için Excel **Veri → Metin/CSV'den** kullanın. UTF-8/Windows-1254 kodlamasını ve ayracı seçin; kod sütunlarını **Metin** yapın. XLSX olarak kaydedip yükleyin.
-- Yükleme mevcut ham veriyi değiştirir; önceki analiz temizlenir. Yeni verideki kayıtlar silinmez.
-- Her sütun için 1/0 seçin. En az bir sütun zorunludur.
-- VBA'da F7=1 kenar boşluklarını temizler; F8=1 Türkçe büyük/küçük harf farkını kaldırır. Formül modu bu iki ayarı uygulamaz; kesin eşleşir.
-- AnalizEt bütün kayıtları işler. Yeşil **ORİJİNAL**, kırmızı **MÜKERRER**, renksiz **TEKİL**.
-- Başlık filtrelerinden durum/grup filtreleyin. Bütün tabloyu sıralayın; tek sütunu bağımsız sıralamayın. Orijinal referans kaynak sırasına dayanır.
-- Alt+F8 → **YanYanaKarsilastir** ile bir grubun ilk 20 kaydını karşılaştırın. Bütün grubu GrubuIncele ile görüntüleyin.
-- Veri/kriter/normalizasyon değiştiğinde **AnalizEt'i tekrar çalıştırın**. VBA çıktısı anlık görüntüdür.
-- **ExcelAktar**, dört sayfalı, değerlerden oluşan statik XLSX çıkarır. Çıktı içindeki kriterleri değiştirmek yeniden analiz yapmaz.
-
-## Veri kuralları
-
-Metin `001`, metin `1` ve sayı `1` farklıdır. Ancak Excel'de sayı `1` üzerine `0000` biçimi uygulanması yeni bir kimlik oluşturmaz. Kodları baştan metin olarak tutun. Tarihler Excel seri sayısıdır. Boş hücre ve boş metin eşleşir. Türkçe harfler korunur; varsayılan karşılaştırma harfe duyarlıdır. Sayılar yuvarlanmaz. Unicode bileşim normalizasyonu yapılmaz.
-
-Formüllü kaynakları yüklemeden önce Excel'de hesaplayıp kaydedin. İçe aktarma değerleri ve biçimleri korur; kaynak makroları, grafikler, yorumlar ve canlı formüller arşivlenmez. Başlıkları boş/tekrarlı sütunlar benzersiz adlandırılır. İç boş satırlar korunur.
-
-## Güvenlik ve test durumu
-
-Dosyalar bir analiz sunucusuna gönderilmez. VBA ağ çağrısı yapmaz. OneDrive eşitlemesi açıksa Excel dosyayı eşitleyebilir; yerel klasör tercih edebilirsiniz. Bu mimari otomatik mevzuat uyumluluğu sağlamaz.
-
-[Doğrulama raporu](docs/DOGRULAMA.md) ve [Excel kabul kontrolü](tests/KABUL_KONTROLLERI.md) henüz çalıştırılmamış masaüstü kontrollerini belirtir. Test edilmemiş bir XLSM veya canlı demo teslim edilmiş gibi sunulmaz.
+**Doğrulama sınırı:** Bu ortamda masaüstü Excel yoktur. Dosya/formül kontrolleri tamamlanmış olsa da Excel LTSC 2024 hesaplaması ve kullanıcı akışı çalıştırılmadı. [Kabul listesini](tests/formul/KABUL_KONTROLLERI.md) önce bir kopya üzerinde deneyin. Ayrıntılar [ana README](README.md) ve [doğrulama raporundadır](docs/DOGRULAMA.md).

@@ -8,32 +8,42 @@ jobs:
     steps:
       - name: Depo dosyalarını al
         uses: actions/checkout@v4
-      - name: Çalışma kitabını ve VBA kaynaklarını doğrula (Excel çalıştırılmaz)
+      - name: Dinamik ve VBA kitaplarını doğrula (Excel çalıştırılmaz)
         shell: pwsh
         run: |
           Add-Type -AssemblyName System.IO.Compression.FileSystem
-          $file = 'deliverables/Duplicate_Audit_Studio.xlsx'
-          $zip = [IO.Compression.ZipFile]::OpenRead((Resolve-Path $file))
-          try {
-            $names = @($zip.Entries | ForEach-Object FullName)
-            if ($names -contains 'xl/vbaProject.bin') { throw 'XLSX makro içermemeli' }
-            if ($names -match '^xl/externalLinks/') { throw 'Dış bağlantı bulundu' }
-            $formulaCount = 0
-            foreach ($entry in $zip.Entries) {
-              if ($entry.FullName.EndsWith('.xml')) {
-                $reader = [IO.StreamReader]::new($entry.Open())
-                try { [xml]$xml = $reader.ReadToEnd() } finally { $reader.Dispose() }
-                if ($entry.FullName -eq 'xl/workbook.xml') {
-                  if ($xml.workbook.sheets.sheet.Count -ne 6) { throw 'Altı sayfa bekleniyor' }
-                }
-                if ($entry.FullName -match '^xl/worksheets/sheet\d+.xml$') {
-                  $formulaCount += @($xml.SelectNodes("//*[local-name()='f']")).Count
+          $books = @(
+            @{ File='Duplicate_Audit_Studio.xlsx'; Sheets=7; Formulas=24; Tables=2 },
+            @{ File='Duplicate_Audit_Studio_VBA_Taban.xlsx'; Sheets=6; Formulas=6300; Tables=0 },
+            @{ File='Ornek_Ham_Veri.xlsx'; Sheets=1; Formulas=0; Tables=1 }
+          )
+          foreach ($book in $books) {
+            $path = Join-Path 'deliverables' $book.File
+            $zip = [IO.Compression.ZipFile]::OpenRead((Resolve-Path $path))
+            try {
+              $names = @($zip.Entries | ForEach-Object FullName)
+              if ($names -contains 'xl/vbaProject.bin') { throw 'XLSX makro içermemeli' }
+              if ($names -match '^xl/externalLinks/') { throw 'Dış bağlantı bulundu' }
+              $formulaCount = 0
+              $tableCount = 0
+              foreach ($entry in $zip.Entries) {
+                if ($entry.FullName.EndsWith('.xml')) {
+                  $reader = [IO.StreamReader]::new($entry.Open())
+                  try { [xml]$xml = $reader.ReadToEnd() } finally { $reader.Dispose() }
+                  if ($entry.FullName -eq 'xl/workbook.xml') {
+                    if ($xml.workbook.sheets.sheet.Count -ne $book.Sheets) { throw 'Sayfa sayısı yanlış' }
+                  }
+                  if ($entry.FullName -match '^xl/worksheets/sheet\d+.xml$') {
+                    $formulaCount += @($xml.SelectNodes("//*[local-name()='f']")).Count
+                  }
+                  if ($entry.FullName -match '^xl/tables/table\d+.xml$') { $tableCount++ }
                 }
               }
-            }
-            if ($formulaCount -lt 6000) { throw 'Kontrol formülleri eksik' }
-            Write-Host "Dosya yapısı geçerli; $formulaCount formül. Excel hesaplaması ve VBA çalıştırma TEST EDİLMEDİ."
-          } finally { $zip.Dispose() }
+              if ($formulaCount -ne $book.Formulas) { throw "Formül sayısı yanlış: $path" }
+              if ($tableCount -ne $book.Tables) { throw "Tablo sayısı yanlış: $path" }
+              Write-Host "$path doğrulandı. Excel hesaplaması ve VBA çalıştırma TEST EDİLMEDİ."
+            } finally { $zip.Dispose() }
+          }
           foreach ($file in @('vba/DuplicateAudit.bas','vba/AuditTests.bas')) {
             if (!(Test-Path $file)) { throw "Dosya eksik: $file" }
             if ((Get-Content $file -Raw) -notmatch 'Option Explicit') { throw "Option Explicit eksik: $file" }
@@ -45,6 +55,8 @@ jobs:
           path: |
             deliverables/*.xlsx
             vba/*.bas
+            README.md
             README.tr.md
-            docs/DOGRULAMA.md
-            tests/KABUL_KONTROLLERI.md
+            docs/*.md
+            docs/*.json
+            tests/**/*.md

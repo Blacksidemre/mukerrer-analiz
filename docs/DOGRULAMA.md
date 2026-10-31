@@ -1,30 +1,27 @@
-# Doğrulama kaydı — 31 Ekim 2026
+# Dinamik formüllü sürüm — doğrulama kaydı
 
-## Geliştirme ortamında yapılan kontroller
+## Yapılan kontroller
 
-- Üretilen iki XLSX dosyası açıldı; ZIP bütünlüğü ve XML ayrıştırma kontrolleri geçti.
-- Beklenen altı sayfa, filtreler, koşullu satır renkleri ve kaynak satır bilgileri yapısal olarak doğrulandı.
-- Her dinamik kitapta 6.300 formül sözdizimsel olarak ayrıştırıldı. Bu kontrol Excel'in formülleri hesaplaması anlamına gelmez.
-- 370 kaynak kaydı korundu; önbellekteki kontrol değerleri bütün kaynak sütunlarıyla karşılaştırıldı ve fark bulunmadı.
-- Paylaşılan sentetik kayıtlar başlangıçtaki dört kriterle bağımsız gruplandı: **180 tekil, 90 orijinal, 100 fazladan mükerrer, 90 tekrarlı grup**. Mutabakat: **370 = 180 + 90 + 100**.
-- Formül önbellekleri beklenen sonuçları içerir. Bu değerler dosya oluşturulurken yazılmıştır; **Excel'in formülleri çalıştırdığının kanıtı değildir**.
-- Dört sayfalı statik çıktı açıldı; hücre formülü kalmadığı doğrulandı. Bu dosya dinamik değildir; analizin anlık görüntüsüdür.
-- Teslim edilen XLSX dosyalarında dış bağlantı parçaları veya VBA ikilisi bulunmaz.
-- Dosya özetleri ve formül sayıları `dogrulama-sonuclari.json` içindedir. Yüklenen kaynak dosya ve analizi GitHub'a eklenmemiştir.
+- Üç teslimat dosyası ZIP ve XML bütünlüğü kontrollerinden geçti; dış bağlantı ve gömülü VBA ikilisi yok.
+- Yeni dinamik kitapta **7 sayfa, 2 gerçek Excel tablosu ve 24 formül** bulundu. Formüllerin sözdizimi, parantez dengesi ve temel işlevlerin bağımsız değişken sayıları kontrol edildi.
+- Taşma başvuruları OOXML içinde `ANCHORARRAY` olarak kaydedildi. LAMBDA parametreleri `_xlpm` önekiyle yazıldı. Türkçe metinlerin karakter bütünlüğü kontrol edildi.
+- HamVeri tablosu, başlangıçta `A1:L371`; KriterSecimleri tablosu `G6:I106`. Ham verinin 370 satır ve 12 sütundaki bütün hücre değerleri önceki sürümle karşılaştırıldı; fark yok.
+- Ham veri ve sonuç sayfalarında koşullu renklendirme kuralları bulundu. Gizli yardımcı sayfa ve dinamik başlıklar doğrulandı.
+- **15 bağımsız referans senaryosu** geçti: tek/çoklu kriter, üçlü grup, sayı/metin ayrımı, Türkçe tutar, metne dönüştürme, boş değerler, anahtar çakışması, Türkçe harf, boşluk, joker karakterler, icra/dosya eşleşmesi, sıfır kriter reddi, sütun sırası ve seri tarih.
+- Bu senaryolar formül tasarımının beklenen sonuçlarını bağımsız hesaplar; **Excel motorunu çalıştırmaz ve gerçek formüllerin doğru hesaplandığını kanıtlamaz**.
+- Örnek_Ham_Veri.xlsx: Ad, Tutar, İcra Dairesi, Dosya Numarası ve Tarih alanlarında 10 sentetik kayıt. Beklenen sonuçlar `tests/formul/BEKLENEN_SONUCLAR.md` dosyasında.
+- Önceki çalışma kitabı VBA için ayrı `Duplicate_Audit_Studio_VBA_Taban.xlsx` adıyla korundu: 6 sayfa, 6.300 formül. VBA kaynak kodu bu revizyonda değiştirilmedi.
+- Dosya özetleri ve sayılar `dogrulama-sonuclari.json` içindedir. Formüllerin tam dökümü `FORMULLER.md` dosyasındadır.
 
-## Çalıştırılmayan veya doğrulanmayan kontroller
+## Çalıştırılmayan kontroller
 
-- Excel LTSC 2024'te yeniden hesaplama ve yerleşik sıralama davranışı.
-- VBA derlemesi ve `TestleriCalistir` içindeki 17 doğrulama kontrolü.
-- Masaüstü Excel'de içe aktarma, kriter değiştirme, filtreleme, sıralama, yan yana karşılaştırma ve dışa aktarma akışı.
-- 500 / 5.000 / 20.000 / 50.000 satırlık VBA performans ölçümleri. Hız veya arayüz yanıt süresi iddiası yoktur.
-- Yayın sırasında PowerShell tabanlı GitHub Actions işinin çalıştığı gözlemlenmedi. Bu iş yalnızca çalışma kitabının dosya yapısını kontrol eder.
-- Gerçek Excel ekran görüntüsü, imzalı makro ikilisi veya derlenmiş XLSM üretilmedi.
+- Masaüstü Excel LTSC 2024 üzerinde formül hesaplaması, otomatik tablo genişlemesi, koşullu renklerin çizilmesi ve kullanıcı akışı.
+- 500 veya 2.000 kayıtla gerçek hesaplama süresi ve arayüz yanıtı.
+- GitHub Actions işinin uzak sunucudaki sonucu.
+- Eski VBA sürümünün derlemesi, motor testleri, içe/dışa aktarma ve 50.000 satır ölçümleri.
 
-## Excel üzerinde tamamlanacak doğrulama
+Bu ortamda masaüstü Excel yoktur. Dosyalardaki formül önbellekleri kitap hazırlanırken yazılmış örnek değerlerdir. Dinamik dizi sonuçları açılışta hesaplanır; önbelleğe bakarak Excel testi geçtiği sonucu çıkarılamaz. Yeni kitap için `tests/formul/KABUL_KONTROLLERI.md`, eski VBA akışı için `tests/KABUL_KONTROLLERI.md` uygulanmalıdır.
 
-Windows ve Excel LTSC 2024 üzerinde `README.tr.md` rehberini izleyin. İki modülü içe aktarın, derleyin, testleri ve performans ölçümlerini çalıştırın; `tests/KABUL_KONTROLLERI.md` listesini tamamlayın. Bu kontroller geçmeden inceleme sürümünü üretim ortamında test edilmiş olarak tanımlamayın. Dosya oluşturma ve inceleme araçları teslim edilen çözümün çalışması için gerekmez; uygulama mantığı yalnızca Excel formülleri ve VBA'dan oluşur.
+## Kapsam ve bilinen sınırlar
 
-## Türkçeleştirme kontrolü
-
-Belgeler, iş akışı mesajları, çalışma kitabının açıklamaları ve VBA kullanıcı metinleri Türkçeleştirildi. Çalışma kitabındaki formüller, hesaplama önbellekleri ve veri sayfaları önceki sürümle karşılaştırıldı. Türkçe metinlerin dosya içindeki karakter bütünlüğü kontrol edildi. Bu kontroller VBA'nın Excel içinde çalıştırıldığı anlamına gelmez.
+Formüllü sürüm 2.000 satır / 100 sütun sınırında analizi açıkça durdurur; kısmi sonuç üretmek amaçlanmaz. Bu sınır performans ölçümü değildir. Sütun başlıkları otomatik listelenir; kullanıcı seçimi ayrı, başlığa bağlı giriş tablosundadır. Yeni başlıklar kullanıcı tarafından seçilene kadar pasiftir. Excel tabloları dışındaki hücreler kapsama girmez. Tarih hücrelerinin görüntü biçimi dinamik sonuçlara otomatik kopyalanmaz.
